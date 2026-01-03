@@ -628,29 +628,39 @@
         </p>
         <div class="two-column">
           <div class="contact-form">
-            <form>
-              <label for="name">Name</label>
-              <input id="name" type="text" name="name" placeholder="Your full name" />
+            <form action="https://formspree.io/f/xwvpqgvq" method="POST">
+  
+  <label for="name">Name</label>
+  <input id="name" type="text" name="name" required placeholder="Your full name" />
 
-              <label for="phone">Phone</label>
-              <input id="phone" type="tel" name="phone" placeholder="+1 (256) 258-9621" />
+  <label for="phone">Phone</label>
+  <input id="phone" type="tel" name="phone" required placeholder="+1 (256) 258-9621" />
 
-              <label for="email">Email</label>
-              <input id="email" type="email" name="email" placeholder="homereadyhelpers@gmail.com" />
+  <label for="email">Email</label>
+  <input id="email" type="email" name="_replyto" required placeholder="your email address" />
 
-              <label for="city">City</label>
-              <input id="city" type="text" name="city" placeholder="Madison, Athens, Huntsville, etc." />
+  <label for="city">City</label>
+  <input id="city" type="text" name="city" placeholder="Madison, Athens, Huntsville, etc." />
 
-              <label for="message">How can I help?</label>
-              <textarea id="message" name="message" placeholder="Provide a brief description of your project or list of items."></textarea>
+  <label for="message">How can I help?</label>
+  <textarea id="message" name="message" required placeholder="Describe your project or list of items."></textarea>
 
-              <label style="display:flex; align-items:center; font-size:0.86rem; gap:0.35rem; margin-bottom: 0.3rem;">
-                <input type="checkbox" name="ok_to_text" style="width:auto; margin:0;" />
-                I am comfortable receiving a text message regarding this request.
-              </label>
+  <label style="display:flex; align-items:center; gap:0.4rem; margin-top:0.4rem;">
+    <input type="checkbox" name="ok_to_text" />
+    Okay to text me regarding this request
+  </label>
 
-              <button type="submit" class="btn btn-primary" style="margin-top:0.6rem;">Submit Request</button>
-            </form>
+  <!-- Optional redirect to a thank-you page -->
+  <input type="hidden" name="_next" value="https://homereadyhelpers.com/thank-you.html">
+
+  <!-- Send email notification to YOUR email -->
+  <input type="hidden" name="_subject" value="New Service Request From HomeReadyHelpers.com">
+
+  <button type="submit" class="btn btn-primary" style="margin-top:1rem;">
+    Submit Request
+  </button>
+
+</form>
           </div>
           <div class="contact-info">
             <h3 style="font-size: 1.08rem; color: var(--brand-navy); margin-bottom: 0.4rem;">Contact Details</h3>
