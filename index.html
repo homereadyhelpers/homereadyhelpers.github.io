@@ -2,680 +2,1347 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>HomeReady Helpers LLC. | Handyman &amp; Home Help</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="HomeReady Helpers LLC. - Friendly, professional handyman, organizing, and moving help serving Madison, Athens, and Huntsville, Alabama." />
-  <link rel="icon" type="image/png" href="logo.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HomeReady Helpers LLC | North Alabama Handyman Services</title>
+  <meta name="description" content="Veteran & Christian-owned handyman service in North Alabama. Honest work, fair prices, and people we actually care about. Call 951-526-1636." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Lora:ital,wght@0,400;0,500;1,400&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet" />
+
   <style>
+    /* ── TOKENS ───────────────────────────────────────────── */
     :root {
-      --brand-navy: #0b2847;
-      --brand-green: #29a24a;
-      --brand-light: #f4f7fb;
-      --brand-text: #112233;
-      --brand-muted: #6c7a8a;
-      --card-bg: #ffffff;
+      --black:   #0d1a0b;
+      --off-black: #0d1a0b;
+      --green:   #4a8c3f;
+      --green-light: #5ba34e;
+      --green-dark:  #346b2a;
+      --white:   #f5f5f2;
+      --grey:    #b0afa9;
+      --border:  rgba(255,255,255,0.08);
+      --font-display: 'Oswald', sans-serif;
+      --font-body:    'Source Sans 3', sans-serif;
+      --font-accent:  'Lora', serif;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
+    /* ── RESET ────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      line-height: 1.6;
-      color: var(--brand-text);
-      background: var(--brand-light);
+      background: var(--black);
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 17px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+    img { max-width: 100%; display: block; }
+    a { color: inherit; text-decoration: none; }
+
+    /* ── UTILITY ──────────────────────────────────────────── */
+    .container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+    .section { padding: 96px 0; background: #0d1a0b; }
+    .section--dark { background: #0a1508; }
+    .section--green { background: var(--green-dark); }
+
+    /* Force ALL sections dark — belt and suspenders */
+    section, footer, nav { background-color: #0d1a0b; }
+    .tag {
+      display: inline-block;
+      font-family: var(--font-display);
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--green-light);
+      margin-bottom: 14px;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      line-height: 1.1;
+      color: var(--white);
+    }
+    .section-title span { color: var(--green-light); }
+    .section-intro {
+      font-family: var(--font-accent);
+      font-size: 1.05rem;
+      color: var(--grey);
+      margin-top: 16px;
+      max-width: 560px;
+    }
+    .btn {
+      display: inline-block;
+      padding: 15px 36px;
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+    .btn-primary {
+      background: var(--green);
+      color: var(--white);
+      border: 2px solid var(--green);
+    }
+    .btn-primary:hover {
+      background: var(--green-light);
+      border-color: var(--green-light);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(74,140,63,0.35);
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--white);
+      border: 2px solid var(--white);
+    }
+    .btn-outline:hover {
+      background: #0d1a0b;
+      color: var(--white);
+      border-color: var(--white);
+      transform: translateY(-2px);
     }
 
-    header {
-      background: var(--brand-navy);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      position: sticky;
-      top: 0;
+    /* ── NOISE TEXTURE OVERLAY ────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.022;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ── NAV ──────────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
       z-index: 100;
+      background: rgba(10,22,8,0.97);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      transition: background 0.3s;
     }
-
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 0 1rem;
-    }
-
-    .nav {
+    .nav-inner {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0.6rem 0;
-      gap: 1.25rem;
+      height: 72px;
     }
-
-    .brand {
+    .nav-logo {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      color: #ffffff;
-      text-decoration: none;
+      gap: 12px;
     }
-
-    .brand-logo {
-      width: 52px;
-      height: 52px;
+    .nav-logo img {
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
-      overflow: hidden;
-      flex-shrink: 0;
-      border: 2px solid #ffffff;
-      background: #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
-
-    .brand-logo img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display: block;
-    }
-
-    .brand-text {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .brand-text-main {
-      font-weight: 700;
+    .nav-logo-text {
+      font-family: var(--font-display);
       font-size: 1.1rem;
-      letter-spacing: 0.04em;
+      font-weight: 700;
+      letter-spacing: 1px;
       text-transform: uppercase;
+      line-height: 1.2;
     }
-
-    .brand-text-sub {
-      font-size: 0.8rem;
-      color: rgba(255, 255, 255, 0.8);
+    .nav-logo-text span { color: var(--green-light); display: block; font-size: 0.65rem; letter-spacing: 3px; font-weight: 400; }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
     }
-
-    nav a {
-      margin-left: 1rem;
-      text-decoration: none;
-      color: #ffffff;
-      font-size: 0.95rem;
-      opacity: 0.9;
+    .nav-links a {
+      font-family: var(--font-display);
+      font-size: 13px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--grey);
+      transition: color 0.2s;
     }
-
-    nav a:hover {
-      opacity: 1;
-      text-decoration: underline;
-      text-underline-offset: 0.18em;
+    .nav-links a:hover { color: var(--white); }
+    .nav-cta {
+      background: var(--green);
+      color: var(--white) !important;
+      padding: 8px 20px;
+      border-radius: 2px;
+      transition: background 0.2s !important;
     }
+    .nav-cta:hover { background: var(--green-light) !important; color: var(--white) !important; }
 
-    .btn {
-      display: inline-block;
-      padding: 0.7rem 1.3rem;
-      border-radius: 999px;
-      border: none;
-      cursor: pointer;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 0.95rem;
-      transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
-      white-space: nowrap;
+    /* hamburger */
+    .nav-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+    .nav-toggle span { display: block; width: 24px; height: 2px; background: var(--white); transition: all 0.3s; }
+    .nav-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav-toggle.open span:nth-child(2) { opacity: 0; }
+    .nav-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* mobile menu */
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 72px; left: 0; right: 0;
+      background: #0d1a0b;
+      border-bottom: 1px solid var(--border);
+      z-index: 99;
+      padding: 24px;
+      flex-direction: column;
+      gap: 20px;
     }
-
-    .btn-primary {
-      background: var(--brand-green);
-      color: #ffffff;
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.18);
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      font-family: var(--font-display);
+      font-size: 18px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--grey);
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
     }
+    .mobile-menu a:hover { color: var(--white); }
 
-    .btn-primary:hover {
-      background: #22863e;
-      transform: translateY(-1px);
-      box-shadow: 0 5px 14px rgba(0, 0, 0, 0.22);
+    /* ── HERO ─────────────────────────────────────────────── */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      padding-top: 72px;
     }
-
-    .btn-outline {
-      background: transparent;
-      border: 1px solid #ffffff;
-      color: #ffffff;
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 70% at 80% 50%, rgba(74,140,63,0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 20% 80%, rgba(74,140,63,0.07) 0%, transparent 60%),
+        var(--black);
     }
-
-    .btn-outline:hover {
-      background: #ffffff;
-      color: var(--brand-navy);
+    /* diagonal stripe accent */
+    .hero-bg::after {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 45%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        -55deg,
+        transparent,
+        transparent 40px,
+        rgba(74,140,63,0.03) 40px,
+        rgba(74,140,63,0.03) 41px
+      );
     }
-
-    .hero {
-      background: radial-gradient(circle at top left, #17467a 0, #0b2847 50%, #061427 100%);
-      color: #ffffff;
-      padding: 2.8rem 0 2.6rem;
-    }
-
     .hero-inner {
+      position: relative;
+      z-index: 2;
       display: grid;
-      grid-template-columns: minmax(0, 2fr) minmax(0, 1.4fr);
-      gap: 2.2rem;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
       align-items: center;
     }
-
-    .hero h1 {
-      font-size: 2.35rem;
-      margin-bottom: 0.35rem;
-    }
-
-    .hero h2 {
-      font-size: 1.25rem;
-      margin-bottom: 0.9rem;
-      font-weight: 500;
-      color: #dbe6f4;
-    }
-
-    .hero p {
-      margin-bottom: 1rem;
-      max-width: 32rem;
-      color: #e3edf9;
-      font-size: 0.98rem;
-    }
-
     .hero-badge {
       display: inline-flex;
       align-items: center;
-      padding: 0.18rem 0.65rem;
-      border-radius: 999px;
-      background: rgba(6, 31, 64, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      font-size: 0.78rem;
-      margin-bottom: 0.6rem;
-      color: #c3e7d3;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+      gap: 8px;
+      background: rgba(74,140,63,0.15);
+      border: 1px solid rgba(74,140,63,0.3);
+      padding: 6px 14px;
+      border-radius: 2px;
+      margin-bottom: 24px;
+      animation: fadeUp 0.6s ease both;
     }
-
     .hero-badge-dot {
-      width: 7px;
-      height: 7px;
+      width: 7px; height: 7px;
+      background: var(--green-light);
       border-radius: 50%;
-      background: var(--brand-green);
-      margin-right: 0.4rem;
+      animation: pulse 2s infinite;
     }
-
-    .hero-buttons {
-      margin-top: 1.1rem;
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.4); }
+    }
+    .hero-badge span {
+      font-family: var(--font-display);
+      font-size: 11px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--green-light);
+    }
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.8rem, 6vw, 5rem);
+      font-weight: 700;
+      text-transform: uppercase;
+      line-height: 1.0;
+      letter-spacing: 1px;
+      animation: fadeUp 0.7s ease 0.1s both;
+    }
+    .hero-title .accent { color: var(--green-light); display: block; }
+    .hero-sub {
+      font-family: var(--font-accent);
+      font-size: 1.15rem;
+      font-style: italic;
+      color: var(--grey);
+      margin-top: 20px;
+      line-height: 1.8;
+      animation: fadeUp 0.7s ease 0.2s both;
+    }
+    .hero-badges {
       display: flex;
+      gap: 12px;
       flex-wrap: wrap;
-      gap: 0.75rem;
+      margin-top: 28px;
+      animation: fadeUp 0.7s ease 0.3s both;
+    }
+    .hero-pill {
+      font-family: var(--font-display);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      color: var(--grey);
+    }
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      margin-top: 36px;
+      flex-wrap: wrap;
+      animation: fadeUp 0.7s ease 0.4s both;
+    }
+    .hero-logo-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 1s ease 0.3s both;
+    }
+    .hero-logo-ring {
+      position: relative;
+      width: 340px;
+      height: 340px;
+    }
+    .hero-logo-ring::before {
+      content: '';
+      position: absolute;
+      inset: -20px;
+      border-radius: 50%;
+      border: 1px solid rgba(74,140,63,0.25);
+      animation: spin 20s linear infinite;
+    }
+    .hero-logo-ring::after {
+      content: '';
+      position: absolute;
+      inset: -40px;
+      border-radius: 50%;
+      border: 1px dashed rgba(74,140,63,0.12);
+      animation: spin 35s linear infinite reverse;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .hero-logo-ring img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      filter: drop-shadow(0 0 40px rgba(74,140,63,0.25));
     }
 
-    .hero-card {
-      background: rgba(3, 18, 40, 0.96);
-      border-radius: 0.9rem;
-      padding: 1.4rem 1.5rem 1.3rem;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.45);
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
     }
 
-    .hero-card h3 {
-      font-size: 1.08rem;
-      margin-bottom: 0.35rem;
-      color: #ffffff;
+    /* ── TRUST BAR ────────────────────────────────────────── */
+    .trust-bar {
+      background: #0d1a0b;
+      padding: 18px 0;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
     }
-
-    .hero-card p {
-      color: #d3e0f3;
-      margin-bottom: 0.6rem;
-      font-size: 0.94rem;
+    .trust-bar-inner {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 48px;
+      flex-wrap: wrap;
     }
-
-    .hero-card ul {
-      list-style: none;
-      font-size: 0.9rem;
-      color: #c7d5ec;
-    }
-
-    .hero-card li {
+    .trust-item {
       display: flex;
       align-items: center;
-      gap: 0.4rem;
-      margin-bottom: 0.25rem;
-    }
-
-    .hero-card-bullet {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--brand-green);
-      flex-shrink: 0;
-    }
-
-    section {
-      padding: 3.2rem 0;
-    }
-
-    section h2 {
-      font-size: 1.65rem;
-      margin-bottom: 0.6rem;
-      text-align: center;
-      color: var(--brand-navy);
-    }
-
-    .section-intro {
-      max-width: 650px;
-      margin: 0 auto 2rem;
-      text-align: center;
-      font-size: 0.98rem;
-      color: var(--brand-muted);
-    }
-
-    section:nth-of-type(even) {
-      background: #ffffff;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1.6rem;
-    }
-
-    .card {
-      background: var(--card-bg);
-      border-radius: 0.9rem;
-      padding: 1.6rem 1.5rem;
-      box-shadow: 0 1px 4px rgba(6, 20, 39, 0.08);
-      border: 1px solid rgba(10, 40, 78, 0.04);
-    }
-
-    .card h3 {
-      font-size: 1.08rem;
-      margin-bottom: 0.35rem;
-      color: var(--brand-navy);
-    }
-
-    .card p {
-      font-size: 0.94rem;
-      color: var(--brand-muted);
-      margin-bottom: 0.35rem;
-    }
-
-    .card ul {
-      list-style: disc;
-      padding-left: 1.25rem;
-      margin-top: 0.35rem;
-      font-size: 0.93rem;
-      color: var(--brand-text);
-    }
-
-    .two-column {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 2rem;
-      align-items: flex-start;
-    }
-
-    .badge {
-      display: inline-block;
-      font-size: 0.78rem;
-      padding: 0.18rem 0.55rem;
-      border-radius: 999px;
-      background: rgba(41, 162, 74, 0.08);
-      color: var(--brand-green);
-      margin-bottom: 0.5rem;
+      gap: 10px;
+      font-family: var(--font-display);
+      font-size: 13px;
+      letter-spacing: 1.5px;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.85);
+    }
+    .trust-icon { font-size: 1.3rem; }
+
+    /* ── ABOUT ────────────────────────────────────────────── */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+    .about-img-wrap {
+      position: relative;
     }
 
-    .pricing-highlight {
-      border-left: 3px solid var(--brand-green);
-      padding-left: 0.85rem;
-      margin-bottom: 0.9rem;
-      font-size: 0.95rem;
-      color: var(--brand-muted);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 48px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
-
-    .pricing-list {
-      list-style: none;
-      padding-left: 0;
-      font-size: 0.95rem;
+    .about-img-box img {
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      object-fit: cover;
+      filter: drop-shadow(0 0 30px rgba(74,140,63,0.2));
     }
-
-    .pricing-list li {
-      margin-bottom: 0.4rem;
-    }
-
-    .pricing-list strong {
-      color: var(--brand-navy);
-    }
-
-    .contact-form {
-      background: var(--card-bg);
-      border-radius: 0.9rem;
-      padding: 1.7rem 1.6rem;
-      box-shadow: 0 1px 4px rgba(6, 20, 39, 0.08);
-      border: 1px solid rgba(10, 40, 78, 0.05);
-    }
-
-    .contact-form label {
-      display: block;
-      font-size: 0.88rem;
-      margin-bottom: 0.25rem;
-      color: var(--brand-navy);
-    }
-
-    .contact-form input,
-    .contact-form textarea {
-      width: 100%;
-      padding: 0.6rem 0.75rem;
-      border-radius: 0.55rem;
-      border: 1px solid #c5ceda;
-      margin-bottom: 0.8rem;
-      font-size: 0.93rem;
-      transition: border 0.15s ease, box-shadow 0.15s ease;
-    }
-
-    .contact-form input:focus,
-    .contact-form textarea:focus {
-      outline: none;
-      border-color: var(--brand-green);
-      box-shadow: 0 0 0 1px rgba(41, 162, 74, 0.3);
-    }
-
-    .contact-form textarea {
-      min-height: 130px;
-      resize: vertical;
-    }
-
-    .contact-info p {
-      margin-bottom: 0.45rem;
-      font-size: 0.95rem;
-      color: var(--brand-text);
-    }
-
-    .contact-info a {
-      color: var(--brand-navy);
-      text-decoration: none;
-    }
-
-    .contact-info a:hover {
-      text-decoration: underline;
-      text-underline-offset: 0.16em;
-    }
-
-    footer {
-      padding: 1.6rem 0 2rem;
+    .about-accent-box {
+      position: absolute;
+      bottom: -20px;
+      right: -20px;
+      background: var(--green);
+      padding: 20px 28px;
+      border-radius: 2px;
+      font-family: var(--font-display);
+      font-size: 13px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
       text-align: center;
-      font-size: 0.85rem;
-      color: var(--brand-muted);
-      background: #061427;
-      color: #b6c4dd;
+    }
+    .about-accent-box strong { display: block; font-size: 2rem; line-height: 1; }
+    .about-text p {
+      font-family: var(--font-accent);
+      font-size: 1.05rem;
+      color: var(--grey);
+      margin-top: 20px;
+      line-height: 1.9;
+    }
+    .about-values {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 32px;
+    }
+    .about-value {
+      background: #0d1a0b;
+      border: 1px solid var(--border);
+      padding: 16px 20px;
+      border-left: 3px solid var(--green);
+      border-radius: 2px;
+    }
+    .about-value strong {
+      font-family: var(--font-display);
+      font-size: 13px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--green-light);
+      display: block;
+      margin-bottom: 4px;
+    }
+    .about-value span {
+      font-size: 0.88rem;
+      color: var(--grey);
     }
 
-    footer a {
-      color: #e2f3ea;
-      text-decoration: none;
+    /* ── SERVICES ─────────────────────────────────────────── */
+    .services-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 56px;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
+    .service-card {
+      background: #0d1a0b;
+      padding: 36px 32px;
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      cursor: default;
+    }
+    .service-card::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 100%; height: 3px;
+      background: var(--green);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.35s ease;
+    }
+    .service-card:hover { background: #0d1a0b; transform: translateY(-4px); }
+    .service-card:hover::before { transform: scaleX(1); }
+    .service-icon {
+      font-size: 2rem;
+      margin-bottom: 16px;
+    }
+    .service-name {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--white);
+      margin-bottom: 8px;
+    }
+    .service-desc {
+      font-size: 0.88rem;
+      color: var(--grey);
+      line-height: 1.7;
+    }
+    .service-price {
+      margin-top: 16px;
+      font-family: var(--font-display);
+      font-size: 0.88rem;
+      color: var(--green-light);
+      letter-spacing: 1px;
     }
 
-    footer a:hover {
-      text-decoration: underline;
-      text-underline-offset: 0.16em;
+    /* ── PRICING ──────────────────────────────────────────── */
+    .pricing-intro {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+    .pricing-intro .section-intro { margin: 16px auto 0; }
+    .pricing-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+    }
+    .pricing-tab {
+      font-family: var(--font-display);
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 10px 24px;
+      background: #0d1a0b;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      cursor: pointer;
+      color: var(--grey);
+      transition: all 0.2s;
+    }
+    .pricing-tab.active, .pricing-tab:hover {
+      background: var(--green);
+      border-color: var(--green);
+      color: var(--white);
+    }
+    .pricing-panel { display: none; }
+    .pricing-panel.active { display: block; }
+    .pricing-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .pricing-table th {
+      font-family: var(--font-display);
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--green-light);
+      padding: 14px 20px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .pricing-table td {
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-size: 0.92rem;
+      color: var(--grey);
+    }
+    .pricing-table tr:last-child td { border-bottom: none; }
+    .pricing-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .pricing-table td:first-child { color: var(--white); font-weight: 500; }
+    .pricing-note {
+      margin-top: 24px;
+      padding: 16px 20px;
+      background: rgba(74,140,63,0.1);
+      border: 1px solid rgba(74,140,63,0.2);
+      border-radius: 2px;
+      font-size: 0.88rem;
+      color: var(--grey);
+      font-family: var(--font-accent);
+      font-style: italic;
+    }
+    .plan-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .plan-card {
+      background: #0d1a0b;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 36px 28px;
+      text-align: center;
+      transition: transform 0.25s;
+      position: relative;
+    }
+    .plan-card:hover { transform: translateY(-6px); }
+    .plan-card.featured {
+      border-color: var(--green);
+      background: rgba(74,140,63,0.08);
+    }
+    .plan-card.featured::before {
+      content: 'MOST POPULAR';
+      position: absolute;
+      top: -12px; left: 50%; transform: translateX(-50%);
+      background: var(--green);
+      font-family: var(--font-display);
+      font-size: 10px;
+      letter-spacing: 2px;
+      padding: 4px 14px;
+      border-radius: 2px;
+      white-space: nowrap;
+    }
+    .plan-name {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--green-light);
+      margin-bottom: 16px;
+    }
+    .plan-price {
+      font-family: var(--font-display);
+      font-size: 3rem;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--white);
+    }
+    .plan-price sup { font-size: 1.2rem; vertical-align: top; margin-top: 10px; }
+    .plan-price sub { font-size: 1rem; font-weight: 400; color: var(--grey); }
+    .plan-features {
+      list-style: none;
+      margin-top: 28px;
+      text-align: left;
+    }
+    .plan-features li {
+      font-size: 0.88rem;
+      color: var(--grey);
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .plan-features li::before { content: '✓'; color: var(--green-light); font-weight: 700; }
+
+    /* ── BOOKING CTA ──────────────────────────────────────── */
+    #book {
+      background: #0d1a0b !important;
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+    #book::before {
+      content: '';
+      position: absolute;
+      top: -50%; right: -20%;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(74,140,63,0.1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .book-inner { position: relative; z-index: 2; max-width: 680px; margin: 0 auto; }
+    .book-quote {
+      font-family: var(--font-accent);
+      font-size: 1.3rem;
+      font-style: italic;
+      color: var(--grey);
+      margin: 20px 0 36px;
+      line-height: 1.9;
+    }
+    .book-actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .book-phone {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 28px;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      letter-spacing: 1px;
+      color: var(--white);
+    }
+    .book-phone a { color: var(--green-light); }
+    .book-phone a:hover { color: var(--white); }
+    .payment-note {
+      margin-top: 20px;
+      font-size: 0.82rem;
+      color: var(--grey);
+      letter-spacing: 0.5px;
     }
 
-    @media (max-width: 768px) {
-      .hero-inner {
-        grid-template-columns: 1fr;
-      }
+    /* ── TESTIMONIALS / WHY US ────────────────────────────── */
+    .why-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-top: 56px;
+    }
+    .why-card {
+      text-align: center;
+      padding: 36px 20px;
+      background: #0d1a0b;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      transition: transform 0.25s;
+    }
+    .why-card:hover { transform: translateY(-4px); }
+    .why-icon { font-size: 2.5rem; margin-bottom: 16px; }
+    .why-title {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--white);
+      margin-bottom: 10px;
+    }
+    .why-desc { font-size: 0.88rem; color: var(--grey); line-height: 1.7; }
 
-      nav {
-        display: none;
-      }
+    /* ── FOOTER ───────────────────────────────────────────── */
+    footer {
+      background: var(--black);
+      padding: 64px 0 32px;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 56px;
+      padding-bottom: 48px;
+      border-bottom: 1px solid var(--border);
+    }
+    .footer-brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .footer-brand-logo img {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+    }
+    .footer-brand-name {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .footer-brand-name span {
+      display: block;
+      font-size: 0.62rem;
+      letter-spacing: 3px;
+      color: var(--green-light);
+      font-weight: 400;
+    }
+    .footer-tagline {
+      font-family: var(--font-accent);
+      font-style: italic;
+      font-size: 0.95rem;
+      color: var(--grey);
+      line-height: 1.8;
+      max-width: 320px;
+    }
+    .footer-heading {
+      font-family: var(--font-display);
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--green-light);
+      margin-bottom: 20px;
+    }
+    .footer-links { list-style: none; }
+    .footer-links li { margin-bottom: 12px; }
+    .footer-links a {
+      font-size: 0.88rem;
+      color: var(--grey);
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--white); }
+    .footer-contact-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 14px;
+      font-size: 0.88rem;
+      color: var(--grey);
+    }
+    .footer-contact-item a { color: var(--green-light); }
+    .footer-contact-item a:hover { color: var(--white); }
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 32px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .footer-copy {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.3);
+    }
+    .footer-badges {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .footer-badge {
+      font-family: var(--font-display);
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 5px 12px;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 2px;
+      color: rgba(255,255,255,0.4);
+    }
+    .footer-badge.green-badge {
+      border-color: rgba(74,140,63,0.35);
+      color: var(--green-light);
+    }
 
-      .nav {
-        justify-content: space-between;
-      }
+    /* ── SCROLL ANIMATIONS ────────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── RESPONSIVE ───────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .hero-inner { grid-template-columns: 1fr; text-align: center; }
+      .hero-logo-wrap { order: -1; }
+      .hero-logo-ring { width: 220px; height: 220px; }
+      .hero-badges, .hero-actions { justify-content: center; }
+      .about-grid { grid-template-columns: 1fr; }
+      .about-img-wrap { display: none; }
+      .services-grid { grid-template-columns: 1fr 1fr; }
+      .plan-cards { grid-template-columns: 1fr; }
+      .why-grid { grid-template-columns: 1fr 1fr; }
+      .footer-grid { grid-template-columns: 1fr; gap: 36px; }
+      .nav-links { display: none; }
+      .nav-toggle { display: flex; }
+      .trust-bar-inner { gap: 24px; }
+    }
+    @media (max-width: 600px) {
+      .services-grid { grid-template-columns: 1fr; }
+      .why-grid { grid-template-columns: 1fr; }
+      .about-values { grid-template-columns: 1fr; }
+      .hero-title { font-size: 2.4rem; }
+      .section { padding: 64px 0; }
+      .footer-bottom { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
 <body>
-  <header>
-    <div class="container nav">
-      <a href="#top" class="brand">
-        <div class="brand-logo">
-          <img src="logo.png" alt="HomeReady Helpers LLC. logo" />
-        </div>
-        <div class="brand-text">
-          <span class="brand-text-main">HomeReady Helpers LLC.</span>
-          <span class="brand-text-sub">Helping hands for everyday needs</span>
+
+  <!-- ── NAV ───────────────────────────────────────────────── -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="#hero" class="nav-logo">
+        <!-- Replace src with your actual hosted logo URL if needed -->
+        <img src="IMG_2296.png" alt="HomeReady Helpers Logo" onerror="this.style.display='none'" />
+        <div class="nav-logo-text">
+          HomeReady Helpers
+          <span>LLC · North Alabama</span>
         </div>
       </a>
-      <nav>
-        <a href="#services">Services</a>
-        <a href="#pricing">Pricing</a>
-        <a href="#about">About</a>
-        <a href="#contact">Contact</a>
-      </nav>
+      <ul class="nav-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#book" class="nav-cta">Book Now</a></li>
+      </ul>
+      <div class="nav-toggle" id="navToggle" onclick="toggleMenu()">
+        <span></span><span></span><span></span>
+      </div>
     </div>
-  </header>
+  </nav>
 
-  <main id="top">
-    <section class="hero">
-      <div class="container hero-inner">
-        <div>
-          <div class="hero-badge">
-            <span class="hero-badge-dot"></span>
-            Professional Home Services in North Alabama
-          </div>
-          <h1>Professional, Fair-Priced Help for Your Home</h1>
-          <h2>Handyman, organizing, and moving support you can trust.</h2>
-          <p>HomeReady Helpers LLC. serves Madison, Athens, and Huntsville, Alabama with dependable, respectful service and clear communication from first call to final walkthrough.</p>
-          <div class="hero-buttons">
-            <a href="" class="btn btn-primary"></a>
-            <a href="#contact" class="btn btn-outline">Request a Service Visit</a>
-          </div>
-        </div>
-        <div>
-          <div class="hero-card">
-            <h3>Helping Hands for Everyday Needs</h3>
-            <p>From minor repairs to move-day assistance, you have one reliable point of contact for the projects that keep your home comfortable and safe.</p>
-            <ul>
-              <li><span class="hero-card-bullet"></span> Careful, detail-oriented workmanship</li>
-              <li><span class="hero-card-bullet"></span> Honest guidance on what is and is not needed</li>
-              <li><span class="hero-card-bullet"></span> Respect for your time, home, and budget</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </section>
+  <!-- mobile menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#about" onclick="closeMenu()">About</a>
+    <a href="#services" onclick="closeMenu()">Services</a>
+    <a href="#pricing" onclick="closeMenu()">Pricing</a>
+    <a href="#book" onclick="closeMenu()" style="color: var(--green-light);">Book Now</a>
+  </div>
 
-    <section id="services">
-      <div class="container">
-        <h2>Services</h2>
-        <p class="section-intro">
-          HomeReady Helpers LLC. offers practical, hands-on support for the tasks that are difficult to keep up with on your own. Each visit is approached with professionalism, reliability, and respect for your home.
+  <!-- ── HERO ──────────────────────────────────────────────── -->
+  <section id="hero">
+    <div class="hero-bg"></div>
+    <div class="container hero-inner">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span class="hero-badge-dot"></span>
+          <span>Serving North Alabama</span>
+        </div>
+        <h1 class="hero-title">
+          Helping Hands
+          <span class="accent">for Everyday</span>
+          Needs.
+        </h1>
+        <p class="hero-sub">
+          We're a veteran &amp; Christian-owned handyman service built on honesty,
+          hard work, and genuine care for the people we serve. No runaround —
+          just good work done right.
         </p>
-        <div class="grid">
-          <div class="card">
-            <h3>Handyman &amp; Home Repairs</h3>
-            <p>Timely attention to small issues prevents larger, more costly problems later.</p>
-            <ul>
-              <li>Light fixture replacement</li>
-              <li>TV mounting and picture hanging</li>
-              <li>Minor drywall repair</li>
-              <li>Caulking around tubs, sinks, and toilets</li>
-              <li>Air filter and smoke detector battery changes</li>
-            </ul>
+        <div class="hero-badges">
+          <span class="hero-pill">🇺🇸 Veteran Owned</span>
+          <span class="hero-pill">✝️ Christian Values</span>
+          <span class="hero-pill">⭐ Licensed &amp; Insured</span>
+        </div>
+        <div class="hero-actions">
+          <a href="https://forms.gle/g29sGJyyHtXctqeb6" target="_blank" class="btn btn-primary">Request a Quote</a>
+          <a href="tel:9515261636" class="btn btn-outline">Call Us</a>
+        </div>
+      </div>
+      <div class="hero-logo-wrap">
+        <div class="hero-logo-ring">
+          <img src="IMG_2296.png" alt="HomeReady Helpers LLC" onerror="this.style.background='#0d1a0b'" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TRUST BAR ──────────────────────────────────────────── -->
+  <div class="trust-bar">
+    <div class="container trust-bar-inner">
+      <div class="trust-item"><span class="trust-icon">🛡️</span> Honest Pricing</div>
+      <div class="trust-item"><span class="trust-icon">⏱️</span> On Time, Every Time</div>
+      <div class="trust-item"><span class="trust-icon">🤝</span> Work Guaranteed</div>
+      <div class="trust-item"><span class="trust-icon">📍</span> North Alabama Local</div>
+    </div>
+  </div>
+
+  <!-- ── ABOUT ──────────────────────────────────────────────── -->
+  <section id="about" class="section">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-img-wrap">
+          <div class="about-img-box">
+            <img src="IMG_2296.png" alt="HomeReady Helpers Logo" onerror="this.style.display='none'" />
           </div>
-          <div class="card">
-            <h3>Home Organization</h3>
-            <p>Thoughtful organization that makes everyday living easier and more efficient.</p>
-            <ul>
-              <li>Closet and pantry reset</li>
-              <li>Kitchen cabinet and drawer organization</li>
-              <li>Garage and storage space organizing</li>
-              <li>Room layout adjustment and furniture positioning</li>
-            </ul>
+          <div class="about-accent-box">
+            <strong>$88</strong>
+            Honest Hourly Rate
           </div>
-          <div class="card">
-            <h3>Moving Support (No Truck)</h3>
-            <p>Reliable help on moving day, without the expense of a full-service moving company.</p>
-            <ul>
-              <li>Packing and unpacking assistance</li>
-              <li>Loading and unloading rental trucks or pods</li>
-              <li>Furniture placement and setup in your new space</li>
-              <li>Light in-home furniture moving</li>
-            </ul>
-          </div>
-          <div class="card">
-            <h3>Furniture Assembly</h3>
-            <p>Assembly completed correctly and safely, with packaging removed when possible.</p>
-            <ul>
-              <li>Beds, dressers, and nightstands</li>
-              <li>Desks and office furniture</li>
-              <li>Bookcases and shelving units</li>
-              <li>Children’s furniture and indoor play items</li>
-            </ul>
-          </div>
-          <div class="card">
-            <h3>Maintenance Visits &amp; Checkups</h3>
-            <p>Regular visits to keep your home in good working order throughout the year.</p>
-            <ul>
-              <li>Monthly or quarterly home checkups</li>
-              <li>Filter and battery replacement</li>
-              <li>Small touch-ups and adjustments</li>
-            </ul>
-          </div>
-          <div class="card">
-            <h3>Senior &amp; Community Support</h3>
-            <p>Dependable assistance designed with seniors and community living in mind.</p>
-            <ul>
-              <li>Room and apartment setup and organizing</li>
-              <li>Move-in and move-out assistance</li>
-            </ul>
+        </div>
+        <div class="about-text reveal">
+          <span class="tag">Who We Are</span>
+          <h2 class="section-title">Built on <span>Faith</span>, Service &amp; Hard Work</h2>
+          <p>
+            HomeReady Helpers LLC is a solo handyman service right here in North Alabama.
+            As a veteran, I know what it means to show up, do the job right, and leave
+            things better than I found them. That's exactly what I bring to every home I walk into.
+          </p>
+          <p>
+            My faith shapes how I treat every customer — with honesty, respect, and genuine care.
+            You won't get surprise charges or shoddy work. You'll get a straight answer, a fair price,
+            and a handshake when the job's done.
+          </p>
+          <div class="about-values">
+            <div class="about-value">
+              <strong>Integrity</strong>
+              <span>What I quote is what you pay.</span>
+            </div>
+            <div class="about-value">
+              <strong>Quality</strong>
+              <span>I take pride in every job, big or small.</span>
+            </div>
+            <div class="about-value">
+              <strong>Reliability</strong>
+              <span>I show up when I say I will.</span>
+            </div>
+            <div class="about-value">
+              <strong>Community</strong>
+              <span>We take care of our neighbors.</span>
+            </div>
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section id="pricing">
-      <div class="container">
-        <h2>Pricing &amp; Approach</h2>
-        <div class="two-column">
-          <div>
-            <span class="badge">Transparent Rates</span>
-            <p class="pricing-highlight">
-              Pricing is designed to be straightforward and fair. You will always know what to expect before work begins. What you are quoted is what you will pay. The only time your price will change is if you add to the scope of work being completed.
-            </p>
-            <br />
-            <span class="badge">Ongoing Care</span>
-            <p class="pricing-highlight">
-              For homeowners who prefer regular support, tailored maintenance visit schedules can be discussed during or after the first appointment.
-            </p>
-          </div>
-          <div class="card">
-            <h3>How a Typical Visit Works</h3>
-            <ol style="padding-left: 1.25rem; font-size: 0.95rem; color: var(--brand-text); margin-top: 0.35rem;">
-              <li>You share what you need assistance with and any timing preferences.</li>
-              <li>You receive a clear expectation of time on site and approximate cost.</li>
-              <li>A visit is scheduled that works with your calendar.</li>
-              <li>Work is completed, followed by a brief walkthrough and confirmation.</li>
-            </ol>
-            <p style="margin-top: 0.75rem; font-size: 0.93rem; color: var(--brand-muted);">
-              If something falls outside the appropriate scope for a handyman service, that is communicated honestly, along with suggestions for next steps.
-            </p>
-          </div>
+  <!-- ── SERVICES ───────────────────────────────────────────── -->
+  <section id="services" class="section section--dark">
+    <div class="container">
+      <div class="services-header reveal">
+        <div>
+          <span class="tag">What We Do</span>
+          <h2 class="section-title">Services We <span>Offer</span></h2>
+          <p class="section-intro">From small repairs to bigger projects — if it needs doing around your house, chances are we can help.</p>
+        </div>
+        <a href="https://forms.gle/g29sGJyyHtXctqeb6" target="_blank" class="btn btn-primary">Get a Free Quote</a>
+      </div>
+      <div class="services-grid">
+
+        <div class="service-card reveal">
+          <div class="service-icon">🧱</div>
+          <div class="service-name">Drywall Repair</div>
+          <div class="service-desc">Holes, cracks, water damage patches — we make walls look like nothing ever happened.</div>
+          <div class="service-price">Starting at $75</div>
+        </div>
+
+        <div class="service-card reveal">
+          <div class="service-icon">🔧</div>
+          <div class="service-name">Fixture Replacement</div>
+          <div class="service-desc">Faucets, light fixtures, ceiling fans, outlets, and more — swapped out clean and right.</div>
+          <div class="service-price">Starting at $125</div>
+        </div>
+
+        <div class="service-card reveal">
+          <div class="service-icon">🎨</div>
+          <div class="service-name">Interior Painting</div>
+          <div class="service-desc">Walls, trim, ceilings — crisp lines and clean finishes that transform a room.</div>
+          <div class="service-price">Starting at $180</div>
+        </div>
+
+        <div class="service-card reveal">
+          <div class="service-icon">🪵</div>
+          <div class="service-name">Flooring Installation</div>
+          <div class="service-desc">Laminate, vinyl plank, tile — installed level and tight, the way it should be.</div>
+          <div class="service-price">Starting at $360</div>
+        </div>
+
+        <div class="service-card reveal">
+          <div class="service-icon">📺</div>
+          <div class="service-name">TV Mounting</div>
+          <div class="service-desc">Mounted securely, cables managed, picture perfect — exactly where you want it.</div>
+          <div class="service-price">Starting at $175</div>
+        </div>
+
+        <div class="service-card reveal">
+          <div class="service-icon">🚪</div>
+          <div class="service-name">Interior Door Install</div>
+          <div class="service-desc">New door, pre-hung door, or hardware replacement — hung square and swinging smooth.</div>
+          <div class="service-price">Contact for quote</div>
+        </div>
+
+        <div class="service-card reveal">
+          <div class="service-icon">🌀</div>
+          <div class="service-name">Dryer Vent Cleaning</div>
+          <div class="service-desc">A clogged dryer vent is a fire hazard. We clear them out fast — and safely.</div>
+          <div class="service-price">$125 flat</div>
+        </div>
+
+        <div class="service-card reveal">
+          <div class="service-icon">🛠️</div>
+          <div class="service-name">Appliance Installation</div>
+          <div class="service-desc">Dishwashers, microwaves, refrigerators, washing machines — hooked up and ready to run.</div>
+          <div class="service-price">Starting at $270</div>
+        </div>
+
+        <div class="service-card reveal">
+          <div class="service-icon">📦</div>
+          <div class="service-name">Furniture Assembly</div>
+          <div class="service-desc">IKEA, Wayfair, Amazon — assembled correctly so nothing wobbles or falls apart.</div>
+          <div class="service-price">Starting at $180</div>
+        </div>
+
+      </div>
+
+      <p class="pricing-note" style="margin-top: 32px;">
+        Don't see your project listed? Reach out anyway — we handle a wide range of home tasks and are happy to take a look.
+        We do not perform major plumbing, electrical, HVAC, or range hood work.
+      </p>
+    </div>
+  </section>
+
+  <!-- ── WHY US ──────────────────────────────────────────────── -->
+  <section class="section">
+    <div class="container">
+      <div style="text-align:center;" class="reveal">
+        <span class="tag">Why HomeReady Helpers</span>
+        <h2 class="section-title">You Deserve Someone <span>You Can Trust</span></h2>
+      </div>
+      <div class="why-grid">
+        <div class="why-card reveal">
+          <div class="why-icon">🇺🇸</div>
+          <div class="why-title">Veteran Owned</div>
+          <div class="why-desc">Discipline, dependability, and a commitment to doing it right — every single time.</div>
+        </div>
+        <div class="why-card reveal">
+          <div class="why-icon">✝️</div>
+          <div class="why-title">Christian Values</div>
+          <div class="why-desc">We treat your home and family with the same respect we'd want for our own.</div>
+        </div>
+        <div class="why-card reveal">
+          <div class="why-icon">💰</div>
+          <div class="why-title">Transparent Pricing</div>
+          <div class="why-desc">You'll always know what you're paying before we start. No hidden fees, no games.</div>
+        </div>
+        <div class="why-card reveal">
+          <div class="why-icon">📍</div>
+          <div class="why-title">Local & Invested</div>
+          <div class="why-desc">We live and work right here in North Alabama. Your community is our community.</div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section id="about">
-      <div class="container">
-        <h2>About HomeReady Helpers LLC.</h2>
-        <div class="two-column">
-          <div>
-            <span class="badge">Service with Integrity</span>
-            <p style="font-size: 0.96rem; color: var(--brand-text); margin-bottom: 0.85rem;">
-              My name is Andrew MacKenzie, and I started HomeReady Helpers LLC. to provide reliable, respectful assistance for the tasks that tend to linger on a homeowner’s to-do list. I enjoy working with my hands, putting things together, and bringing order to a space. This work allows me to serve individuals and families in a practical, meaningful way.
-            </p>
-            <p style="font-size: 0.96rem; color: var(--brand-text); margin-bottom: 0.85rem;">
-              Each project is approached with care, from a single repair to a full day of organizing or move support. Communication is clear, expectations are set up front, and your home is treated with the same attention and respect as my own.
-            </p>
-            <p style="font-size: 0.96rem; color: var(--brand-text);">
-              As a Christian and Veteran business owner, my goal is to operate with integrity, fairness, and diligence, providing service that is both dependable and worth the investment.
-            </p>
-          </div>
-          <div>
-            <h3 style="font-size: 1.08rem; color: var(--brand-navy); margin-bottom: 0.4rem;">Service Area</h3>
-            <p style="font-size: 0.94rem; color: var(--brand-muted); margin-bottom: 0.4rem;">
-              HomeReady Helpers LLC. currently serves homeowners, renters, and seniors in:
-            </p>
-            <ul style="padding-left: 1.25rem; font-size: 0.94rem; color: var(--brand-text); margin-bottom: 0.85rem;">
-              <li>Madison, Alabama</li>
-              <li>Athens, Alabama</li>
-              <li>Huntsville, Alabama</li>
-              <li>Nearby surrounding areas upon request</li>
+  <!-- ── PRICING ─────────────────────────────────────────────── -->
+  <section id="pricing" class="section section--dark">
+    <div class="container">
+      <div class="pricing-intro reveal">
+        <span class="tag">Rates &amp; Plans</span>
+        <h2 class="section-title">Straightforward <span>Pricing</span></h2>
+        <p class="section-intro">No price tag shock. No confusion. Just honest rates for honest work.</p>
+      </div>
+
+      <div class="pricing-tabs">
+        <button class="pricing-tab active" onclick="showTab('labor')">Labor Rates</button>
+        <button class="pricing-tab" onclick="showTab('subscriptions')">Monthly Plans</button>
+        <button class="pricing-tab" onclick="showTab('packages')">Hour Packages</button>
+      </div>
+
+      <!-- LABOR RATES -->
+      <div class="pricing-panel active" id="tab-labor">
+        <table class="pricing-table">
+          <thead>
+            <tr>
+              <th>Service</th>
+              <th>Price Range</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Hourly Rate</td><td>$88 / hr</td><td>0.5 hr minimum increments</td></tr>
+            <tr><td>Minimum Service Call</td><td>$125</td><td>Applies to all jobs</td></tr>
+            <tr><td>Drywall Patch</td><td>$75 – $265</td><td>Labor only</td></tr>
+            <tr><td>Fixture / Install</td><td>$125 – $360</td><td>Labor only</td></tr>
+            <tr><td>Interior Painting</td><td>$180 – $1,400</td><td>Labor only</td></tr>
+            <tr><td>Flooring Install</td><td>$360 – $530</td><td>Labor only</td></tr>
+            <tr><td>Appliance Install</td><td>$270</td><td>Labor only</td></tr>
+            <tr><td>Dryer Vent Cleaning</td><td>$125</td><td>Flat rate</td></tr>
+            <tr><td>TV Mounting</td><td>$175</td><td>Labor only</td></tr>
+            <tr><td>Furniture Assembly</td><td>$180 – $360</td><td>Labor only</td></tr>
+            <tr><td>Toilet Seal</td><td>$135</td><td>Labor only</td></tr>
+            <tr><td>Eaves Lights</td><td>$125 – $225</td><td>Labor only</td></tr>
+            <tr><td>Materials (sourced by us)</td><td>Cost + 20%</td><td>When we supply materials</td></tr>
+          </tbody>
+        </table>
+        <div class="pricing-note">
+          Payment accepted via Cash, Zelle, or Venmo. Venmo transactions include a 2% + $0.10 processing fee.
+        </div>
+      </div>
+
+      <!-- SUBSCRIPTION PLANS -->
+      <div class="pricing-panel" id="tab-subscriptions">
+        <div class="plan-cards">
+          <div class="plan-card reveal">
+            <div class="plan-name">Basic</div>
+            <div class="plan-price"><sup>$</sup>99<sub>/mo</sub></div>
+            <ul class="plan-features">
+              <li>1 visit per month</li>
+              <li>1 hour of labor included</li>
+              <li>No material allowance</li>
+              <li>$88/hr for overages</li>
+              <li>$1,070/yr (save ~10%)</li>
             </ul>
-            <p style="font-size: 0.94rem; color: var(--brand-muted);">
-              If you are unsure whether your location is included, you are welcome to reach out and ask.
-            </p>
+            <a href="https://forms.gle/g29sGJyyHtXctqeb6" target="_blank" class="btn btn-outline" style="margin-top:24px; width:100%; text-align:center;">Get Started</a>
+          </div>
+          <div class="plan-card featured reveal">
+            <div class="plan-name">Standard</div>
+            <div class="plan-price"><sup>$</sup>149<sub>/mo</sub></div>
+            <ul class="plan-features">
+              <li>1 visit per month</li>
+              <li>1.5 hours of labor included</li>
+              <li>$30 material allowance</li>
+              <li>$88/hr for overages</li>
+              <li>$1,600/yr (save ~11%)</li>
+            </ul>
+            <a href="https://forms.gle/g29sGJyyHtXctqeb6" target="_blank" class="btn btn-primary" style="margin-top:24px; width:100%; text-align:center;">Get Started</a>
+          </div>
+          <div class="plan-card reveal">
+            <div class="plan-name">Premium</div>
+            <div class="plan-price"><sup>$</sup>199<sub>/mo</sub></div>
+            <ul class="plan-features">
+              <li>1x/mo (2 hrs) or 2x/mo (1 hr ea.)</li>
+              <li>2 hours of labor included</li>
+              <li>$60 material allowance</li>
+              <li>$88/hr for overages</li>
+              <li>$2,150/yr (save ~10%)</li>
+            </ul>
+            <a href="https://forms.gle/g29sGJyyHtXctqeb6" target="_blank" class="btn btn-outline" style="margin-top:24px; width:100%; text-align:center;">Get Started</a>
           </div>
         </div>
       </div>
-    </section>
 
-    <section id="contact">
-      <div class="container">
-        <h2>Schedule a Visit</h2>
-        <p class="section-intro">
-          To request service, provide a brief description of what you need help with and your preferred timing. You will receive a follow-up to confirm details and next steps.
+      <!-- HOUR PACKAGES -->
+      <div class="pricing-panel" id="tab-packages">
+        <table class="pricing-table">
+          <thead>
+            <tr>
+              <th>Package</th>
+              <th>Monthly</th>
+              <th>Annual (10% off)</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>4-Hour Block</td><td>$352</td><td>$3,802</td><td>You provide all materials</td></tr>
+            <tr><td>8-Hour Block</td><td>$704</td><td>$7,603</td><td>You provide all materials</td></tr>
+            <tr><td>12-Hour Block</td><td>$1,056</td><td>$11,405</td><td>You provide all materials</td></tr>
+          </tbody>
+        </table>
+        <div class="pricing-note">
+          Hour packages are great for landlords, property managers, or homeowners with ongoing projects.
+          Unused hours expire at the end of each month — no rollover. Overage hours billed at $88/hr.
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── BOOKING CTA ────────────────────────────────────────── -->
+  <section id="book" class="section">
+    <div class="container">
+      <div class="book-inner reveal">
+        <span class="tag">Let's Get to Work</span>
+        <h2 class="section-title">Ready to <span>Get Started?</span></h2>
+        <p class="book-quote">
+          "Whatever you do, work at it with all your heart, as working for the Lord,
+          not for human masters." — Colossians 3:23
         </p>
-        <div class="two-column">
-          <div class="contact-form">
-           <form action="https://formspree.io/f/xwvpqgvq" method="POST">
-  <label for="name">Name</label>
-  <input id="name" type="text" name="name" required placeholder="Your full name" />
-
-  <label for="phone">Phone</label>
-  <input id="phone" type="tel" name="phone" required placeholder="" />
-
-  <label for="email">Email</label>
-  <input id="email" type="email" name="email" required placeholder="homereadyhelpers@gmail.com" />
-
-  <label for="city">City</label>
-  <input id="city" type="text" name="city" placeholder="Madison, Athens, Huntsville, etc." />
-
-  <label for="message">How can I help?</label>
-  <textarea id="message" name="message" required placeholder="Describe what you need help with."></textarea>
-
-<label style="display: flex; align-items: center; gap: 2px;">
-  <input type="checkbox" name="ok_to_text" style="margin: 0;" />
-  Okay to text me.
-</label>
-
-  <button type="submit" class="btn btn-primary" style="margin-top:0.6rem;">Submit Request</button>
-  <br />
-</form>
-          </div>
-          <div class="contact-info">
-            <h3 style="font-size: 1.08rem; color: var(--brand-navy); margin-bottom: 0.4rem;">Contact Details</h3>
-            <p><strong>Phone:</strong> <a href=""></a> 951-526-1636</p>
-            <p><strong>Email:</strong> <a href="mailto:homereadyhelpers@gmail.com">homereadyhelpers@gmail.com</a></p>
-            <p><strong>Typical Hours:</strong> Monday – Thursday, 8:00 a.m. – 6:00 p.m.</p>
-            <br />
-            <p style="font-size: 0.94rem; color: var(--brand-muted);">
-              If you reach out outside of regular hours, your message will be reviewed and answered as soon as possible on the next business day.
-            </p>
-          </div>
+        <div class="book-actions">
+          <a href="https://forms.gle/g29sGJyyHtXctqeb6" target="_blank" class="btn btn-primary">Fill Out Our Request Form</a>
         </div>
-      </div>
-    </section>
-  </main>
 
+        <p class="payment-note">We accept Cash · Zelle · Venmo &nbsp;|&nbsp; Materials sourced by us billed at cost + 20%</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ─────────────────────────────────────────────── -->
   <footer>
     <div class="container">
-      <p>&copy; <span id="year"></span> HomeReady Helpers LLC. All rights reserved. | Website content for informational purposes only.</p>
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand-logo">
+            <img src="IMG_2296.png" alt="HomeReady Helpers Logo" onerror="this.style.display='none'" />
+            <div class="footer-brand-name">
+              HomeReady Helpers
+              <span>LLC · North Alabama</span>
+            </div>
+          </div>
+          <p class="footer-tagline">
+            Veteran &amp; Christian-owned handyman service. We show up, we do it right,
+            and we treat your home like our own.
+          </p>
+        </div>
+        <div>
+          <div class="footer-heading">Quick Links</div>
+          <ul class="footer-links">
+            <li><a href="#about">About Us</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#pricing">Pricing</a></li>
+            <li><a href="https://forms.gle/g29sGJyyHtXctqeb6" target="_blank">Request a Quote</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-heading">Contact</div>
+          <div class="footer-contact-item">
+            📞 <a href="tel:9515261636">951-526-1636</a>
+          </div>
+          <div class="footer-contact-item">
+            📍 North Alabama
+          </div>
+          <div class="footer-contact-item">
+            💬 <a href="https://forms.gle/g29sGJyyHtXctqeb6" target="_blank">Request Form</a>
+          </div>
+          <div class="footer-contact-item" style="margin-top: 8px;">
+            💳 Cash · Zelle · Venmo
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copy">© 2025 HomeReady Helpers LLC. All rights reserved.</p>
+        <div class="footer-badges">
+          <span class="footer-badge green-badge">🇺🇸 Veteran Owned</span>
+          <span class="footer-badge green-badge">✝️ Christian Owned</span>
+          <span class="footer-badge">North Alabama</span>
+        </div>
+      </div>
     </div>
   </footer>
 
   <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
+    // ── NAV TOGGLE ──
+    function toggleMenu() {
+      document.getElementById('navToggle').classList.toggle('open');
+      document.getElementById('mobileMenu').classList.toggle('open');
+    }
+    function closeMenu() {
+      document.getElementById('navToggle').classList.remove('open');
+      document.getElementById('mobileMenu').classList.remove('open');
+    }
+
+    // ── PRICING TABS ──
+    function showTab(tab) {
+      document.querySelectorAll('.pricing-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.pricing-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('tab-' + tab).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    // ── SCROLL REVEAL ──
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // ── SMOOTH NAV HIGHLIGHT ──
+    window.addEventListener('scroll', () => {
+      const nav = document.querySelector('nav');
+      nav.style.background = window.scrollY > 40
+        ? 'rgba(13,13,13,0.97)'
+        : 'rgba(10,22,8,0.95)';
+    });
   </script>
 </body>
 </html>
