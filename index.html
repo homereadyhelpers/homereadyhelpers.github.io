@@ -8,879 +8,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Lora:ital,wght@0,400;0,500;1,400&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet" />
-
-  <style>
-    /* ── TOKENS ───────────────────────────────────────────── */
-    :root {
-      --black:   #0d1a0b;
-      --off-black: #0d1a0b;
-      --green:   #4a8c3f;
-      --green-light: #5ba34e;
-      --green-dark:  #346b2a;
-      --white:   #f5f5f2;
-      --grey:    #b0afa9;
-      --border:  rgba(255,255,255,0.08);
-      --font-display: 'Oswald', sans-serif;
-      --font-body:    'Source Sans 3', sans-serif;
-      --font-accent:  'Lora', serif;
-    }
-
-    /* ── RESET ────────────────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background: var(--black);
-      color: var(--white);
-      font-family: var(--font-body);
-      font-size: 17px;
-      line-height: 1.7;
-      overflow-x: hidden;
-    }
-    img { max-width: 100%; display: block; }
-    a { color: inherit; text-decoration: none; }
-
-    /* ── UTILITY ──────────────────────────────────────────── */
-    .container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
-    .section { padding: 96px 0; background: #0d1a0b; }
-    .section--dark { background: #0a1508; }
-    .section--green { background: var(--green-dark); }
-
-    /* Force ALL sections dark — belt and suspenders */
-    section, footer, nav { background-color: #0d1a0b; }
-    .tag {
-      display: inline-block;
-      font-family: var(--font-display);
-      font-size: 11px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--green-light);
-      margin-bottom: 14px;
-    }
-    .section-title {
-      font-family: var(--font-display);
-      font-size: clamp(2rem, 5vw, 3.2rem);
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      line-height: 1.1;
-      color: var(--white);
-    }
-    .section-title span { color: var(--green-light); }
-    .section-intro {
-      font-family: var(--font-accent);
-      font-size: 1.05rem;
-      color: var(--grey);
-      margin-top: 16px;
-      max-width: 560px;
-    }
-    .btn {
-      display: inline-block;
-      padding: 15px 36px;
-      font-family: var(--font-display);
-      font-size: 15px;
-      font-weight: 600;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      border-radius: 2px;
-      cursor: pointer;
-      transition: all 0.25s ease;
-    }
-    .btn-primary {
-      background: var(--green);
-      color: var(--white);
-      border: 2px solid var(--green);
-    }
-    .btn-primary:hover {
-      background: var(--green-light);
-      border-color: var(--green-light);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(74,140,63,0.35);
-    }
-    .btn-outline {
-      background: transparent;
-      color: var(--white);
-      border: 2px solid var(--white);
-    }
-    .btn-outline:hover {
-      background: #0d1a0b;
-      color: var(--white);
-      border-color: var(--white);
-      transform: translateY(-2px);
-    }
-
-    /* ── NOISE TEXTURE OVERLAY ────────────────────────────── */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
-      opacity: 0.022;
-      pointer-events: none;
-      z-index: 9999;
-    }
-
-    /* ── NAV ──────────────────────────────────────────────── */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      background: rgba(10,22,8,0.97);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      transition: background 0.3s;
-    }
-    .nav-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 72px;
-    }
-    .nav-logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .nav-logo img {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-    }
-    .nav-logo-text {
-      font-family: var(--font-display);
-      font-size: 1.1rem;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      line-height: 1.2;
-    }
-    .nav-logo-text span { color: var(--green-light); display: block; font-size: 0.65rem; letter-spacing: 3px; font-weight: 400; }
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 32px;
-      list-style: none;
-    }
-    .nav-links a {
-      font-family: var(--font-display);
-      font-size: 13px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--grey);
-      transition: color 0.2s;
-    }
-    .nav-links a:hover { color: var(--white); }
-    .nav-cta {
-      background: var(--green);
-      color: var(--white) !important;
-      padding: 8px 20px;
-      border-radius: 2px;
-      transition: background 0.2s !important;
-    }
-    .nav-cta:hover { background: var(--green-light) !important; color: var(--white) !important; }
-
-    /* hamburger */
-    .nav-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
-    .nav-toggle span { display: block; width: 24px; height: 2px; background: var(--white); transition: all 0.3s; }
-    .nav-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-    .nav-toggle.open span:nth-child(2) { opacity: 0; }
-    .nav-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-
-    /* mobile menu */
-    .mobile-menu {
-      display: none;
-      position: fixed;
-      top: 72px; left: 0; right: 0;
-      background: #0d1a0b;
-      border-bottom: 1px solid var(--border);
-      z-index: 99;
-      padding: 24px;
-      flex-direction: column;
-      gap: 20px;
-    }
-    .mobile-menu.open { display: flex; }
-    .mobile-menu a {
-      font-family: var(--font-display);
-      font-size: 18px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--grey);
-      padding: 8px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .mobile-menu a:hover { color: var(--white); }
-
-    /* ── HERO ─────────────────────────────────────────────── */
-    #hero {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      position: relative;
-      overflow: hidden;
-      padding-top: 72px;
-    }
-    .hero-bg {
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 60% 70% at 80% 50%, rgba(74,140,63,0.12) 0%, transparent 70%),
-        radial-gradient(ellipse 40% 40% at 20% 80%, rgba(74,140,63,0.07) 0%, transparent 60%),
-        var(--black);
-    }
-    /* diagonal stripe accent */
-    .hero-bg::after {
-      content: '';
-      position: absolute;
-      top: 0; right: 0;
-      width: 45%;
-      height: 100%;
-      background: repeating-linear-gradient(
-        -55deg,
-        transparent,
-        transparent 40px,
-        rgba(74,140,63,0.03) 40px,
-        rgba(74,140,63,0.03) 41px
-      );
-    }
-    .hero-inner {
-      position: relative;
-      z-index: 2;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 64px;
-      align-items: center;
-    }
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(74,140,63,0.15);
-      border: 1px solid rgba(74,140,63,0.3);
-      padding: 6px 14px;
-      border-radius: 2px;
-      margin-bottom: 24px;
-      animation: fadeUp 0.6s ease both;
-    }
-    .hero-badge-dot {
-      width: 7px; height: 7px;
-      background: var(--green-light);
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(1.4); }
-    }
-    .hero-badge span {
-      font-family: var(--font-display);
-      font-size: 11px;
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
-      color: var(--green-light);
-    }
-    .hero-title {
-      font-family: var(--font-display);
-      font-size: clamp(2.8rem, 6vw, 5rem);
-      font-weight: 700;
-      text-transform: uppercase;
-      line-height: 1.0;
-      letter-spacing: 1px;
-      animation: fadeUp 0.7s ease 0.1s both;
-    }
-    .hero-title .accent { color: var(--green-light); display: block; }
-    .hero-sub {
-      font-family: var(--font-accent);
-      font-size: 1.15rem;
-      font-style: italic;
-      color: var(--grey);
-      margin-top: 20px;
-      line-height: 1.8;
-      animation: fadeUp 0.7s ease 0.2s both;
-    }
-    .hero-badges {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 28px;
-      animation: fadeUp 0.7s ease 0.3s both;
-    }
-    .hero-pill {
-      font-family: var(--font-display);
-      font-size: 10px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      padding: 6px 14px;
-      border: 1px solid var(--border);
-      border-radius: 2px;
-      color: var(--grey);
-    }
-    .hero-actions {
-      display: flex;
-      gap: 16px;
-      margin-top: 36px;
-      flex-wrap: wrap;
-      animation: fadeUp 0.7s ease 0.4s both;
-    }
-    .hero-logo-wrap {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      animation: fadeIn 1s ease 0.3s both;
-    }
-    .hero-logo-ring {
-      position: relative;
-      width: 340px;
-      height: 340px;
-    }
-    .hero-logo-ring::before {
-      content: '';
-      position: absolute;
-      inset: -20px;
-      border-radius: 50%;
-      border: 1px solid rgba(74,140,63,0.25);
-      animation: spin 20s linear infinite;
-    }
-    .hero-logo-ring::after {
-      content: '';
-      position: absolute;
-      inset: -40px;
-      border-radius: 50%;
-      border: 1px dashed rgba(74,140,63,0.12);
-      animation: spin 35s linear infinite reverse;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .hero-logo-ring img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 50%;
-      filter: drop-shadow(0 0 40px rgba(74,140,63,0.25));
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(24px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
-
-    /* ── TRUST BAR ────────────────────────────────────────── */
-    .trust-bar {
-      background: #0d1a0b;
-      padding: 18px 0;
-      border-top: 1px solid rgba(255,255,255,0.08);
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-    }
-    .trust-bar-inner {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 48px;
-      flex-wrap: wrap;
-    }
-    .trust-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-family: var(--font-display);
-      font-size: 13px;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.85);
-    }
-    .trust-icon { font-size: 1.3rem; }
-
-    /* ── ABOUT ────────────────────────────────────────────── */
-    .about-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 80px;
-      align-items: center;
-    }
-    .about-img-wrap {
-      position: relative;
-    }
-
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 48px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .about-img-box img {
-      width: 260px;
-      height: 260px;
-      border-radius: 50%;
-      object-fit: cover;
-      filter: drop-shadow(0 0 30px rgba(74,140,63,0.2));
-    }
-    .about-accent-box {
-      position: absolute;
-      bottom: -20px;
-      right: -20px;
-      background: var(--green);
-      padding: 20px 28px;
-      border-radius: 2px;
-      font-family: var(--font-display);
-      font-size: 13px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      text-align: center;
-    }
-    .about-accent-box strong { display: block; font-size: 2rem; line-height: 1; }
-    .about-text p {
-      font-family: var(--font-accent);
-      font-size: 1.05rem;
-      color: var(--grey);
-      margin-top: 20px;
-      line-height: 1.9;
-    }
-    .about-values {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-top: 32px;
-    }
-    .about-value {
-      background: #0d1a0b;
-      border: 1px solid var(--border);
-      padding: 16px 20px;
-      border-left: 3px solid var(--green);
-      border-radius: 2px;
-    }
-    .about-value strong {
-      font-family: var(--font-display);
-      font-size: 13px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: var(--green-light);
-      display: block;
-      margin-bottom: 4px;
-    }
-    .about-value span {
-      font-size: 0.88rem;
-      color: var(--grey);
-    }
-
-    /* ── SERVICES ─────────────────────────────────────────── */
-    .services-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      margin-bottom: 56px;
-      flex-wrap: wrap;
-      gap: 24px;
-    }
-    .services-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 2px;
-    }
-    .service-card {
-      background: #0d1a0b;
-      padding: 36px 32px;
-      border: 1px solid var(--border);
-      position: relative;
-      overflow: hidden;
-      transition: all 0.3s ease;
-      cursor: default;
-    }
-    .service-card::before {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0;
-      width: 100%; height: 3px;
-      background: var(--green);
-      transform: scaleX(0);
-      transform-origin: left;
-      transition: transform 0.35s ease;
-    }
-    .service-card:hover { background: #0d1a0b; transform: translateY(-4px); }
-    .service-card:hover::before { transform: scaleX(1); }
-    .service-icon {
-      font-size: 2rem;
-      margin-bottom: 16px;
-    }
-    .service-name {
-      font-family: var(--font-display);
-      font-size: 1.1rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--white);
-      margin-bottom: 8px;
-    }
-    .service-desc {
-      font-size: 0.88rem;
-      color: var(--grey);
-      line-height: 1.7;
-    }
-    .service-price {
-      margin-top: 16px;
-      font-family: var(--font-display);
-      font-size: 0.88rem;
-      color: var(--green-light);
-      letter-spacing: 1px;
-    }
-
-    /* ── PRICING ──────────────────────────────────────────── */
-    .pricing-intro {
-      text-align: center;
-      margin-bottom: 56px;
-    }
-    .pricing-intro .section-intro { margin: 16px auto 0; }
-    .pricing-tabs {
-      display: flex;
-      justify-content: center;
-      gap: 4px;
-      margin-bottom: 40px;
-      flex-wrap: wrap;
-    }
-    .pricing-tab {
-      font-family: var(--font-display);
-      font-size: 12px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      padding: 10px 24px;
-      background: #0d1a0b;
-      border: 1px solid var(--border);
-      border-radius: 2px;
-      cursor: pointer;
-      color: var(--grey);
-      transition: all 0.2s;
-    }
-    .pricing-tab.active, .pricing-tab:hover {
-      background: var(--green);
-      border-color: var(--green);
-      color: var(--white);
-    }
-    .pricing-panel { display: none; }
-    .pricing-panel.active { display: block; }
-    .pricing-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    .pricing-table th {
-      font-family: var(--font-display);
-      font-size: 12px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--green-light);
-      padding: 14px 20px;
-      text-align: left;
-      border-bottom: 1px solid var(--border);
-    }
-    .pricing-table td {
-      padding: 16px 20px;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-      font-size: 0.92rem;
-      color: var(--grey);
-    }
-    .pricing-table tr:last-child td { border-bottom: none; }
-    .pricing-table tr:hover td { background: rgba(255,255,255,0.02); }
-    .pricing-table td:first-child { color: var(--white); font-weight: 500; }
-    .pricing-note {
-      margin-top: 24px;
-      padding: 16px 20px;
-      background: rgba(74,140,63,0.1);
-      border: 1px solid rgba(74,140,63,0.2);
-      border-radius: 2px;
-      font-size: 0.88rem;
-      color: var(--grey);
-      font-family: var(--font-accent);
-      font-style: italic;
-    }
-    .plan-cards {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-    }
-    .plan-card {
-      background: #0d1a0b;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 36px 28px;
-      text-align: center;
-      transition: transform 0.25s;
-      position: relative;
-    }
-    .plan-card:hover { transform: translateY(-6px); }
-    .plan-card.featured {
-      border-color: var(--green);
-      background: rgba(74,140,63,0.08);
-    }
-    .plan-card.featured::before {
-      content: 'MOST POPULAR';
-      position: absolute;
-      top: -12px; left: 50%; transform: translateX(-50%);
-      background: var(--green);
-      font-family: var(--font-display);
-      font-size: 10px;
-      letter-spacing: 2px;
-      padding: 4px 14px;
-      border-radius: 2px;
-      white-space: nowrap;
-    }
-    .plan-name {
-      font-family: var(--font-display);
-      font-size: 1rem;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--green-light);
-      margin-bottom: 16px;
-    }
-    .plan-price {
-      font-family: var(--font-display);
-      font-size: 3rem;
-      font-weight: 700;
-      line-height: 1;
-      color: var(--white);
-    }
-    .plan-price sup { font-size: 1.2rem; vertical-align: top; margin-top: 10px; }
-    .plan-price sub { font-size: 1rem; font-weight: 400; color: var(--grey); }
-    .plan-features {
-      list-style: none;
-      margin-top: 28px;
-      text-align: left;
-    }
-    .plan-features li {
-      font-size: 0.88rem;
-      color: var(--grey);
-      padding: 8px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .plan-features li::before { content: '✓'; color: var(--green-light); font-weight: 700; }
-
-    /* ── BOOKING CTA ──────────────────────────────────────── */
-    #book {
-      background: #0d1a0b !important;
-      position: relative;
-      overflow: hidden;
-      text-align: center;
-    }
-    #book::before {
-      content: '';
-      position: absolute;
-      top: -50%; right: -20%;
-      width: 600px; height: 600px;
-      background: radial-gradient(circle, rgba(74,140,63,0.1) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .book-inner { position: relative; z-index: 2; max-width: 680px; margin: 0 auto; }
-    .book-quote {
-      font-family: var(--font-accent);
-      font-size: 1.3rem;
-      font-style: italic;
-      color: var(--grey);
-      margin: 20px 0 36px;
-      line-height: 1.9;
-    }
-    .book-actions {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .book-phone {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 28px;
-      justify-content: center;
-      font-family: var(--font-display);
-      font-size: 1.5rem;
-      letter-spacing: 1px;
-      color: var(--white);
-    }
-    .book-phone a { color: var(--green-light); }
-    .book-phone a:hover { color: var(--white); }
-    .payment-note {
-      margin-top: 20px;
-      font-size: 0.82rem;
-      color: var(--grey);
-      letter-spacing: 0.5px;
-    }
-
-    /* ── TESTIMONIALS / WHY US ────────────────────────────── */
-    .why-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 24px;
-      margin-top: 56px;
-    }
-    .why-card {
-      text-align: center;
-      padding: 36px 20px;
-      background: #0d1a0b;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      transition: transform 0.25s;
-    }
-    .why-card:hover { transform: translateY(-4px); }
-    .why-icon { font-size: 2.5rem; margin-bottom: 16px; }
-    .why-title {
-      font-family: var(--font-display);
-      font-size: 1rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--white);
-      margin-bottom: 10px;
-    }
-    .why-desc { font-size: 0.88rem; color: var(--grey); line-height: 1.7; }
-
-    /* ── FOOTER ───────────────────────────────────────────── */
-    footer {
-      background: var(--black);
-      padding: 64px 0 32px;
-    }
-    .footer-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr;
-      gap: 56px;
-      padding-bottom: 48px;
-      border-bottom: 1px solid var(--border);
-    }
-    .footer-brand-logo {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 20px;
-    }
-    .footer-brand-logo img {
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-    }
-    .footer-brand-name {
-      font-family: var(--font-display);
-      font-size: 1.1rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-    .footer-brand-name span {
-      display: block;
-      font-size: 0.62rem;
-      letter-spacing: 3px;
-      color: var(--green-light);
-      font-weight: 400;
-    }
-    .footer-tagline {
-      font-family: var(--font-accent);
-      font-style: italic;
-      font-size: 0.95rem;
-      color: var(--grey);
-      line-height: 1.8;
-      max-width: 320px;
-    }
-    .footer-heading {
-      font-family: var(--font-display);
-      font-size: 11px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--green-light);
-      margin-bottom: 20px;
-    }
-    .footer-links { list-style: none; }
-    .footer-links li { margin-bottom: 12px; }
-    .footer-links a {
-      font-size: 0.88rem;
-      color: var(--grey);
-      transition: color 0.2s;
-    }
-    .footer-links a:hover { color: var(--white); }
-    .footer-contact-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      margin-bottom: 14px;
-      font-size: 0.88rem;
-      color: var(--grey);
-    }
-    .footer-contact-item a { color: var(--green-light); }
-    .footer-contact-item a:hover { color: var(--white); }
-    .footer-bottom {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-top: 32px;
-      flex-wrap: wrap;
-      gap: 16px;
-    }
-    .footer-copy {
-      font-size: 0.8rem;
-      color: rgba(255,255,255,0.3);
-    }
-    .footer-badges {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .footer-badge {
-      font-family: var(--font-display);
-      font-size: 9px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      padding: 5px 12px;
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 2px;
-      color: rgba(255,255,255,0.4);
-    }
-    .footer-badge.green-badge {
-      border-color: rgba(74,140,63,0.35);
-      color: var(--green-light);
-    }
-
-    /* ── SCROLL ANIMATIONS ────────────────────────────────── */
-    .reveal {
-      opacity: 0;
-      transform: translateY(32px);
-      transition: opacity 0.7s ease, transform 0.7s ease;
-    }
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* ── RESPONSIVE ───────────────────────────────────────── */
-    @media (max-width: 900px) {
-      .hero-inner { grid-template-columns: 1fr; text-align: center; }
-      .hero-logo-wrap { order: -1; }
-      .hero-logo-ring { width: 220px; height: 220px; }
-      .hero-badges, .hero-actions { justify-content: center; }
-      .about-grid { grid-template-columns: 1fr; }
-      .about-img-wrap { display: none; }
-      .services-grid { grid-template-columns: 1fr 1fr; }
-      .plan-cards { grid-template-columns: 1fr; }
-      .why-grid { grid-template-columns: 1fr 1fr; }
-      .footer-grid { grid-template-columns: 1fr; gap: 36px; }
-      .nav-links { display: none; }
-      .nav-toggle { display: flex; }
-      .trust-bar-inner { gap: 24px; }
-    }
-    @media (max-width: 600px) {
-      .services-grid { grid-template-columns: 1fr; }
-      .why-grid { grid-template-columns: 1fr; }
-      .about-values { grid-template-columns: 1fr; }
-      .hero-title { font-size: 2.4rem; }
-      .section { padding: 64px 0; }
-      .footer-bottom { flex-direction: column; align-items: flex-start; }
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
+  <!-- ── SCROLL PROGRESS BAR ─────────────────────────────────── -->
+  <div class="scroll-progress"></div>
 
   <!-- ── NAV ───────────────────────────────────────────────── -->
   <nav>
     <div class="container nav-inner">
       <a href="#hero" class="nav-logo">
-        <!-- Replace src with your actual hosted logo URL if needed -->
         <img src="IMG_2296.png" alt="HomeReady Helpers Logo" onerror="this.style.display='none'" />
         <div class="nav-logo-text">
           HomeReady Helpers
@@ -893,9 +31,9 @@
         <li><a href="#pricing">Pricing</a></li>
         <li><a href="#book" class="nav-cta">Book Now</a></li>
       </ul>
-      <div class="nav-toggle" id="navToggle" onclick="toggleMenu()">
+      <button class="nav-toggle" id="navToggle" onclick="toggleMenu()" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobileMenu">
         <span></span><span></span><span></span>
-      </div>
+      </button>
     </div>
   </nav>
 
@@ -942,6 +80,10 @@
         </div>
       </div>
     </div>
+    <div class="scroll-cue" aria-hidden="true">
+      <span>Scroll</span>
+      <span class="scroll-cue-line"></span>
+    </div>
   </section>
 
   <!-- ── TRUST BAR ──────────────────────────────────────────── -->
@@ -963,7 +105,7 @@
             <img src="IMG_2296.png" alt="HomeReady Helpers Logo" onerror="this.style.display='none'" />
           </div>
           <div class="about-accent-box">
-            <strong>$88</strong>
+            <strong data-count-to="88" data-count-prefix="$">$0</strong>
             Honest Hourly Rate
           </div>
         </div>
@@ -980,7 +122,7 @@
             You won't get surprise charges or shoddy work. You'll get a straight answer, a fair price,
             and a handshake when the job's done.
           </p>
-          <div class="about-values">
+          <div class="about-values reveal stagger">
             <div class="about-value">
               <strong>Integrity</strong>
               <span>What I quote is what you pay.</span>
@@ -1014,65 +156,65 @@
         </div>
         <a href="https://forms.gle/g29sGJyyHtXctqeb6" target="_blank" class="btn btn-primary">Get a Free Quote</a>
       </div>
-      <div class="services-grid">
+      <div class="services-grid reveal stagger">
 
-        <div class="service-card reveal">
+        <div class="service-card">
           <div class="service-icon">🧱</div>
           <div class="service-name">Drywall Repair</div>
           <div class="service-desc">Holes, cracks, water damage patches — we make walls look like nothing ever happened.</div>
           <div class="service-price">Starting at $75</div>
         </div>
 
-        <div class="service-card reveal">
+        <div class="service-card">
           <div class="service-icon">🔧</div>
           <div class="service-name">Fixture Replacement</div>
           <div class="service-desc">Faucets, light fixtures, ceiling fans, outlets, and more — swapped out clean and right.</div>
           <div class="service-price">Starting at $125</div>
         </div>
 
-        <div class="service-card reveal">
+        <div class="service-card">
           <div class="service-icon">🎨</div>
           <div class="service-name">Interior Painting</div>
           <div class="service-desc">Walls, trim, ceilings — crisp lines and clean finishes that transform a room.</div>
           <div class="service-price">Starting at $180</div>
         </div>
 
-        <div class="service-card reveal">
+        <div class="service-card">
           <div class="service-icon">🪵</div>
           <div class="service-name">Flooring Installation</div>
           <div class="service-desc">Laminate, vinyl plank, tile — installed level and tight, the way it should be.</div>
           <div class="service-price">Starting at $360</div>
         </div>
 
-        <div class="service-card reveal">
+        <div class="service-card">
           <div class="service-icon">📺</div>
           <div class="service-name">TV Mounting</div>
           <div class="service-desc">Mounted securely, cables managed, picture perfect — exactly where you want it.</div>
           <div class="service-price">Starting at $175</div>
         </div>
 
-        <div class="service-card reveal">
+        <div class="service-card">
           <div class="service-icon">🚪</div>
           <div class="service-name">Interior Door Install</div>
           <div class="service-desc">New door, pre-hung door, or hardware replacement — hung square and swinging smooth.</div>
           <div class="service-price">Contact for quote</div>
         </div>
 
-        <div class="service-card reveal">
+        <div class="service-card">
           <div class="service-icon">🌀</div>
           <div class="service-name">Dryer Vent Cleaning</div>
           <div class="service-desc">A clogged dryer vent is a fire hazard. We clear them out fast — and safely.</div>
           <div class="service-price">$125 flat</div>
         </div>
 
-        <div class="service-card reveal">
+        <div class="service-card">
           <div class="service-icon">🛠️</div>
           <div class="service-name">Appliance Installation</div>
           <div class="service-desc">Dishwashers, microwaves, refrigerators, washing machines — hooked up and ready to run.</div>
           <div class="service-price">Starting at $270</div>
         </div>
 
-        <div class="service-card reveal">
+        <div class="service-card">
           <div class="service-icon">📦</div>
           <div class="service-name">Furniture Assembly</div>
           <div class="service-desc">IKEA, Wayfair, Amazon — assembled correctly so nothing wobbles or falls apart.</div>
@@ -1095,23 +237,23 @@
         <span class="tag">Why HomeReady Helpers</span>
         <h2 class="section-title">You Deserve Someone <span>You Can Trust</span></h2>
       </div>
-      <div class="why-grid">
-        <div class="why-card reveal">
+      <div class="why-grid reveal stagger">
+        <div class="why-card">
           <div class="why-icon">🇺🇸</div>
           <div class="why-title">Veteran Owned</div>
           <div class="why-desc">Discipline, dependability, and a commitment to doing it right — every single time.</div>
         </div>
-        <div class="why-card reveal">
+        <div class="why-card">
           <div class="why-icon">✝️</div>
           <div class="why-title">Christian Values</div>
           <div class="why-desc">We treat your home and family with the same respect we'd want for our own.</div>
         </div>
-        <div class="why-card reveal">
+        <div class="why-card">
           <div class="why-icon">💰</div>
           <div class="why-title">Transparent Pricing</div>
           <div class="why-desc">You'll always know what you're paying before we start. No hidden fees, no games.</div>
         </div>
-        <div class="why-card reveal">
+        <div class="why-card">
           <div class="why-icon">📍</div>
           <div class="why-title">Local & Invested</div>
           <div class="why-desc">We live and work right here in North Alabama. Your community is our community.</div>
@@ -1130,9 +272,9 @@
       </div>
 
       <div class="pricing-tabs">
-        <button class="pricing-tab active" onclick="showTab('labor')">Labor Rates</button>
-        <button class="pricing-tab" onclick="showTab('subscriptions')">Monthly Plans</button>
-        <button class="pricing-tab" onclick="showTab('packages')">Hour Packages</button>
+        <button class="pricing-tab active" onclick="showTab('labor', this)">Labor Rates</button>
+        <button class="pricing-tab" onclick="showTab('subscriptions', this)">Monthly Plans</button>
+        <button class="pricing-tab" onclick="showTab('packages', this)">Hour Packages</button>
       </div>
 
       <!-- LABOR RATES -->
@@ -1296,7 +438,7 @@
         </div>
       </div>
       <div class="footer-bottom">
-        <p class="footer-copy">© 2025 HomeReady Helpers LLC. All rights reserved.</p>
+        <p class="footer-copy">© <span id="year">2025</span> HomeReady Helpers LLC. All rights reserved.</p>
         <div class="footer-badges">
           <span class="footer-badge green-badge">🇺🇸 Veteran Owned</span>
           <span class="footer-badge green-badge">✝️ Christian Owned</span>
@@ -1306,43 +448,15 @@
     </div>
   </footer>
 
-  <script>
-    // ── NAV TOGGLE ──
-    function toggleMenu() {
-      document.getElementById('navToggle').classList.toggle('open');
-      document.getElementById('mobileMenu').classList.toggle('open');
-    }
-    function closeMenu() {
-      document.getElementById('navToggle').classList.remove('open');
-      document.getElementById('mobileMenu').classList.remove('open');
-    }
+  <!-- ── MOBILE STICKY CTA BAR ──────────────────────────────── -->
+  <div class="mobile-cta-bar">
+    <a href="tel:9515261636" class="cta-call">📞 Call</a>
+    <a href="https://forms.gle/g29sGJyyHtXctqeb6" target="_blank" class="cta-quote">Get a Quote</a>
+  </div>
 
-    // ── PRICING TABS ──
-    function showTab(tab) {
-      document.querySelectorAll('.pricing-panel').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.pricing-tab').forEach(t => t.classList.remove('active'));
-      document.getElementById('tab-' + tab).classList.add('active');
-      event.target.classList.add('active');
-    }
+  <!-- ── BACK TO TOP ─────────────────────────────────────────── -->
+  <button class="back-to-top" aria-label="Back to top">↑</button>
 
-    // ── SCROLL REVEAL ──
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-        }
-      });
-    }, { threshold: 0.12 });
-
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-    // ── SMOOTH NAV HIGHLIGHT ──
-    window.addEventListener('scroll', () => {
-      const nav = document.querySelector('nav');
-      nav.style.background = window.scrollY > 40
-        ? 'rgba(13,13,13,0.97)'
-        : 'rgba(10,22,8,0.95)';
-    });
-  </script>
+  <script src="script.js" defer></script>
 </body>
 </html>
