@@ -1072,6 +1072,36 @@ footer {
   }
 }
 
+/* ── INSTALL TIP BANNER ───────────────────────────────────── */
+.install-tip {
+  display: none;
+  background: var(--green-dark);
+  padding-top: 72px;
+}
+.install-tip.show { display: block; }
+.install-tip-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  padding: 10px 24px;
+  font-size: 0.85rem;
+  color: var(--white);
+}
+.install-tip-inner button {
+  background: none;
+  border: none;
+  color: var(--white);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.8;
+  padding: 4px 8px;
+}
+.install-tip-inner button:hover { opacity: 1; }
+.install-tip.show ~ .estimate-hero { padding-top: 56px; }
+
 /* ── ESTIMATE GENERATOR ────────────────────────────────── */
 .estimate-hero {
   padding-top: 152px;

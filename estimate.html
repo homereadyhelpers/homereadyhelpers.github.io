@@ -5,6 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Instant Estimate | HomeReady Helpers LLC</title>
   <meta name="description" content="Describe your handyman job and get an instant ballpark estimate from HomeReady Helpers LLC — veteran & Christian-owned, North Alabama." />
+
+  <!-- Social share preview (Facebook, etc.) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Instant Estimate | HomeReady Helpers LLC" />
+  <meta property="og:description" content="Describe your job, get an instant ballpark estimate. Veteran & Christian-owned handyman service in North Alabama." />
+  <meta property="og:image" content="https://homereadyhelpers.com/icons/icon-512.png" />
+  <meta property="og:url" content="https://homereadyhelpers.com/estimate.html" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0d1a0b" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="HR Estimate" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Lora:ital,wght@0,400;0,500;1,400&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet" />
@@ -45,6 +63,14 @@
     <a href="index.html#pricing" onclick="closeMenu()">Pricing</a>
     <a href="estimate.html" onclick="closeMenu()" style="color: var(--green-light);">Instant Estimate</a>
     <a href="index.html#book" onclick="closeMenu()">Book Now</a>
+  </div>
+
+  <!-- ── INSTALL TIP ──────────────────────────────────────────── -->
+  <div class="install-tip" id="installTip">
+    <div class="container install-tip-inner">
+      <span id="installTipText">Add this to your home screen for one-tap access next time.</span>
+      <button type="button" id="installTipDismiss" aria-label="Dismiss">&times;</button>
+    </div>
   </div>
 
   <!-- ── ESTIMATE HERO ───────────────────────────────────────── -->
