@@ -21,7 +21,7 @@ const MODEL = "claude-haiku-4-5-20251001";
 const RATE_LIMIT_MAX = 8; // requests per IP
 const RATE_LIMIT_WINDOW_SECONDS = 60 * 60; // per hour
 
-const SYSTEM_PROMPT = `You are the quoting assistant for HomeReady Helpers LLC, a Christian and veteran-owned solo handyman business in North Alabama (owner: Andrew). Read the customer's plain-English description of a job and return an honest, fair estimate using the business's real pricing rules below. Always call the provide_quote tool exactly once — never respond in plain text.
+const SYSTEM_PROMPT = `You are the quoting assistant for HomeReady Helpers LLC, a Christian and veteran-owned solo handyman business in North Alabama (owner: Andrew). Read the customer's plain-English description of a job and return an honest, fair estimate using the business's real pricing rules below. You may search the web first if the material-pricing rule below applies, but you must always finish by calling the provide_quote tool — never respond in plain text.
 
 PRICING RULES (labor only — the customer provides all materials unless noted):
 - Hourly rate: $88/hr, billed in 0.5 hr increments
@@ -41,13 +41,23 @@ PRICING RULES (labor only — the customer provides all materials unless noted):
 
 OUT OF SCOPE: the business does NOT perform major plumbing, electrical, HVAC, or range hood work. If the described job is clearly one of these (e.g. "rewire a breaker panel," "install new HVAC ductwork," "repipe a bathroom"), set inScope to false and write a brief, friendly declineReason explaining it's outside what HomeReady Helpers handles, and suggest calling 951-526-1636 to talk through options. Minor tasks explicitly listed above (fixture/faucet swap, toilet seal, TV mount) ARE in scope even though they touch plumbing/electrical-adjacent fixtures.
 
+MATERIAL PRICING LOOKUPS: You have a web_search tool restricted to homedepot.com and lowes.com. Use it — at most twice — only when the job clearly requires HomeReady Helpers to source a specific priced material (the customer says "you supply the [item]," or a materials-sourced line item is genuinely called for) and a real current price would meaningfully sharpen the estimate. Do NOT search for routine labor-only jobs, vague requests, or materials the customer will supply themselves (that's the default assumption). When you do search, find a realistic current price for the specific item, add a line item priced at that cost + 20% per the materials policy above, and note the source and price you found (e.g. "Delta 4-in centerset faucet, ~$95 at Home Depot, + 20% sourcing fee"). Never fabricate a price — if search doesn't turn up a clear one, give a reasonable range based on typical costs and say so in the note instead of inventing a specific figure.
+
 RULES:
 - Never quote below the $125 minimum, even for tiny jobs.
 - Round all dollar amounts to the nearest $5.
 - For jobs combining multiple listed services, add them together and list each as its own line item.
 - If the description is too vague to price precisely, still give a best-guess range based on the most likely interpretation, and use notes to ask for more detail.
 - If the job would clearly take multiple visits or is unusually large in scope, mention that in notes.
-- Subscription plans exist: Basic $99/mo (1 hr labor), Standard $149/mo (1.5 hr labor + $30 materials), Premium $199/mo (2 hrs labor + $60 materials), all with $88/hr overage. If the job sounds small and recurring ("monthly," "few little things," "ongoing"), set suggestPlan to true and briefly explain which plan fits in planSuggestion. Otherwise leave suggestPlan false.`;
+- Subscription plans exist: Basic $99/mo (1 hr labor), Standard $149/mo (1.5 hr labor + $30 materials), Premium $199/mo (2 hrs labor + $60 materials), all with $88/hr overage. If the job sounds small and recurring ("monthly," "few little things," "ongoing"), set suggestPlan to true and briefly explain which plan fits in planSuggestion. Otherwise leave suggestPlan false.
+- Whether or not you search, your final action must always be calling provide_quote — never end on a plain-text reply or on a search alone.`;
+
+const WEB_SEARCH_TOOL = {
+  type: "web_search_20250305",
+  name: "web_search",
+  max_uses: 2,
+  allowed_domains: ["homedepot.com", "lowes.com"],
+};
 
 const QUOTE_TOOL = {
   name: "provide_quote",
@@ -197,58 +207,84 @@ export default {
         );
       }
 
-      let anthropicRes;
-      try {
-        anthropicRes = await fetch("https://api.anthropic.com/v1/messages", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": env.ANTHROPIC_API_KEY,
-            "anthropic-version": "2023-06-01",
-          },
-          body: JSON.stringify({
-            model: MODEL,
-            max_tokens: 800,
-            system: SYSTEM_PROMPT,
-            messages: [{ role: "user", content: description }],
-            tools: [QUOTE_TOOL],
-            tool_choice: { type: "tool", name: "provide_quote" },
-          }),
-        });
-      } catch {
-        return jsonResponse(
-          { error: "Couldn't reach the quote service. Please try again shortly." },
-          502,
-          origin
+      // tool_choice is "any" (not forced to provide_quote) so Claude is free to
+      // call web_search first when the material-pricing rule applies, then
+      // finish with provide_quote — a forced single-tool choice would block it
+      // from ever calling web_search. web_search is server-executed (Anthropic
+      // runs the search and feeds results back within the same call), so this
+      // usually resolves in one round trip; the pause_turn branch below only
+      // matters if Claude's server-side tool loop needs to continue.
+      let messages = [{ role: "user", content: description }];
+      let data;
+      let attempts = 0;
+
+      while (attempts < 3) {
+        attempts++;
+        let anthropicRes;
+        try {
+          anthropicRes = await fetch("https://api.anthropic.com/v1/messages", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-api-key": env.ANTHROPIC_API_KEY,
+              "anthropic-version": "2023-06-01",
+            },
+            body: JSON.stringify({
+              model: MODEL,
+              max_tokens: 1500,
+              system: SYSTEM_PROMPT,
+              messages,
+              tools: [WEB_SEARCH_TOOL, QUOTE_TOOL],
+              tool_choice: { type: "any" },
+            }),
+          });
+        } catch {
+          return jsonResponse(
+            { error: "Couldn't reach the quote service. Please try again shortly." },
+            502,
+            origin
+          );
+        }
+
+        if (!anthropicRes.ok) {
+          const detail = await anthropicRes.text().catch(() => "");
+          return jsonResponse(
+            {
+              error: "Quote service returned an error. Please try again shortly.",
+              detail: detail.slice(0, 300),
+            },
+            502,
+            origin
+          );
+        }
+
+        data = await anthropicRes.json();
+        const toolUse = (data.content || []).find(
+          (block) => block.type === "tool_use" && block.name === "provide_quote"
         );
+        if (toolUse) {
+          return jsonResponse({ quote: toolUse.input }, 200, origin);
+        }
+
+        if (data.stop_reason === "pause_turn") {
+          // Claude's server-side tool loop (search) needs another round —
+          // resend the original turn plus its in-progress response, per
+          // Anthropic's pause_turn handling. Do NOT add a "Continue" message.
+          messages = [
+            { role: "user", content: description },
+            { role: "assistant", content: data.content },
+          ];
+          continue;
+        }
+
+        break;
       }
 
-      if (!anthropicRes.ok) {
-        const detail = await anthropicRes.text().catch(() => "");
-        return jsonResponse(
-          {
-            error: "Quote service returned an error. Please try again shortly.",
-            detail: detail.slice(0, 300),
-          },
-          502,
-          origin
-        );
-      }
-
-      const data = await anthropicRes.json();
-      const toolUse = (data.content || []).find(
-        (block) => block.type === "tool_use" && block.name === "provide_quote"
+      return jsonResponse(
+        { error: "Couldn't generate a quote from that description. Please try rephrasing." },
+        502,
+        origin
       );
-
-      if (!toolUse) {
-        return jsonResponse(
-          { error: "Couldn't generate a quote from that description. Please try rephrasing." },
-          502,
-          origin
-        );
-      }
-
-      return jsonResponse({ quote: toolUse.input }, 200, origin);
     } catch (err) {
       return jsonResponse(
         { error: "Something went wrong generating that estimate. Please try again.", detail: String(err && err.message || err) },
