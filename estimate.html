@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Instant Estimate | HomeReady Helpers LLC</title>
+  <meta name="description" content="Describe your handyman job and get an instant ballpark estimate from HomeReady Helpers LLC — veteran & Christian-owned, North Alabama." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Lora:ital,wght@0,400;0,500;1,400&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ── SCROLL PROGRESS BAR ─────────────────────────────────── -->
+  <div class="scroll-progress"></div>
+
+  <!-- ── NAV ───────────────────────────────────────────────── -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="index.html#hero" class="nav-logo">
+        <img src="IMG_2296.png" alt="HomeReady Helpers Logo" onerror="this.style.display='none'" />
+        <div class="nav-logo-text">
+          HomeReady Helpers
+          <span>LLC · North Alabama</span>
+        </div>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html#about">About</a></li>
+        <li><a href="index.html#services">Services</a></li>
+        <li><a href="index.html#pricing">Pricing</a></li>
+        <li><a href="estimate.html" class="active-link">Instant Estimate</a></li>
+        <li><a href="index.html#book" class="nav-cta">Book Now</a></li>
+      </ul>
+      <button class="nav-toggle" id="navToggle" onclick="toggleMenu()" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobileMenu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- mobile menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html#about" onclick="closeMenu()">About</a>
+    <a href="index.html#services" onclick="closeMenu()">Services</a>
+    <a href="index.html#pricing" onclick="closeMenu()">Pricing</a>
+    <a href="estimate.html" onclick="closeMenu()" style="color: var(--green-light);">Instant Estimate</a>
+    <a href="index.html#book" onclick="closeMenu()">Book Now</a>
+  </div>
+
+  <!-- ── ESTIMATE HERO ───────────────────────────────────────── -->
+  <section class="estimate-hero">
+    <div class="container">
+      <span class="tag">Instant Estimate</span>
+      <h1 class="section-title">What's the <span>Job?</span></h1>
+      <p class="section-intro">Tell us what needs doing in a sentence or two — we'll price it against our real rates and give you a ballpark, right now.</p>
+    </div>
+  </section>
+
+  <!-- ── ESTIMATE FORM ───────────────────────────────────────── -->
+  <section class="section" style="padding-top: 0;">
+    <div class="container estimate-wrap">
+      <div class="estimate-card">
+        <label class="estimate-label" for="jobInput">Describe the job</label>
+        <textarea
+          id="jobInput"
+          class="estimate-textarea"
+          maxlength="600"
+          placeholder="e.g. Ceiling fan install in the master bedroom, old fan removed, plus a bathroom faucet swap."
+        ></textarea>
+        <div class="estimate-meta-row">
+          <span class="estimate-char-count" id="charCount">0 / 600</span>
+          <span class="estimate-char-count">Ctrl/Cmd + Enter to submit</span>
+        </div>
+        <button class="btn btn-primary estimate-submit" id="estimateBtn" type="button">
+          <span class="estimate-spinner"></span>
+          <span class="estimate-submit-label">Generate Estimate</span>
+        </button>
+        <p class="estimate-disclaimer">
+          This is an automated ballpark for planning purposes only — final pricing is always confirmed on-site before work begins.
+        </p>
+
+        <div class="estimate-error" id="estimateError"></div>
+      </div>
+
+      <!-- RESULT: in-scope quote -->
+      <div class="estimate-result" id="estimateResult">
+        <div class="estimate-result-card">
+          <div class="estimate-result-head">
+            <span class="estimate-badge">✓ Estimate Ready</span>
+            <div class="estimate-job-title" id="rJobTitle"></div>
+            <div class="estimate-pills">
+              <div class="estimate-pill-price" id="rPrice"></div>
+              <div class="estimate-pill-time" id="rTime"></div>
+            </div>
+          </div>
+          <div class="estimate-result-body">
+            <div id="rLineItems"></div>
+            <div class="estimate-notes-box" id="rNotesBox" style="display:none">
+              <span class="estimate-notes-label">Notes</span>
+              <span id="rNotes"></span>
+            </div>
+            <div class="estimate-plan-box" id="rPlanBox" style="display:none">
+              <span class="estimate-plan-label">💡 Might Be Worth a Plan</span>
+              <span id="rPlan"></span>
+            </div>
+          </div>
+          <div class="estimate-result-actions">
+            <a href="tel:9515261636" class="btn btn-outline">Call to Confirm</a>
+            <a href="https://forms.gle/g29sGJyyHtXctqeb6" target="_blank" class="btn btn-primary">Book This Job</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESULT: out of scope -->
+      <div class="estimate-result" id="estimateDecline">
+        <div class="estimate-decline-card">
+          <span class="estimate-badge">Outside What We Handle</span>
+          <p class="estimate-decline-text" id="rDeclineReason"></p>
+          <a href="tel:9515261636" class="btn btn-outline">Call 951-526-1636</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ─────────────────────────────────────────────── -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand-logo">
+            <img src="IMG_2296.png" alt="HomeReady Helpers Logo" onerror="this.style.display='none'" />
+            <div class="footer-brand-name">
+              HomeReady Helpers
+              <span>LLC · North Alabama</span>
+            </div>
+          </div>
+          <p class="footer-tagline">
+            Veteran &amp; Christian-owned handyman service. We show up, we do it right,
+            and we treat your home like our own.
+          </p>
+        </div>
+        <div>
+          <div class="footer-heading">Quick Links</div>
+          <ul class="footer-links">
+            <li><a href="index.html#about">About Us</a></li>
+            <li><a href="index.html#services">Services</a></li>
+            <li><a href="index.html#pricing">Pricing</a></li>
+            <li><a href="https://forms.gle/g29sGJyyHtXctqeb6" target="_blank">Request a Quote</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-heading">Contact</div>
+          <div class="footer-contact-item">
+            📞 <a href="tel:9515261636">951-526-1636</a>
+          </div>
+          <div class="footer-contact-item">
+            📍 North Alabama
+          </div>
+          <div class="footer-contact-item">
+            💬 <a href="https://forms.gle/g29sGJyyHtXctqeb6" target="_blank">Request Form</a>
+          </div>
+          <div class="footer-contact-item" style="margin-top: 8px;">
+            💳 Cash · Zelle · Venmo
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copy">© <span id="year">2025</span> HomeReady Helpers LLC. All rights reserved.</p>
+        <div class="footer-badges">
+          <span class="footer-badge green-badge">🇺🇸 Veteran Owned</span>
+          <span class="footer-badge green-badge">✝️ Christian Owned</span>
+          <span class="footer-badge">North Alabama</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ── MOBILE STICKY CTA BAR ──────────────────────────────── -->
+  <div class="mobile-cta-bar">
+    <a href="tel:9515261636" class="cta-call">📞 Call</a>
+    <a href="https://forms.gle/g29sGJyyHtXctqeb6" target="_blank" class="cta-quote">Get a Quote</a>
+  </div>
+
+  <!-- ── BACK TO TOP ─────────────────────────────────────────── -->
+  <button class="back-to-top" aria-label="Back to top">↑</button>
+
+  <script src="script.js" defer></script>
+  <script src="estimate.js" defer></script>
+</body>
+</html>
