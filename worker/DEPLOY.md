@@ -40,3 +40,11 @@ Visiting the URL directly in a browser should return:
 ```json
 {"status":"ok","service":"homeready-quote-api"}
 ```
+
+## Material price lookups (Home Depot / Lowe's)
+No extra setup needed — this is built into the Worker code, not a separate binding. When a
+job clearly needs HomeReady Helpers to source a specific material, Claude can search
+homedepot.com/lowes.com (only those two sites, capped at 2 searches per quote) to price it
+before finalizing the estimate. This only fires occasionally per the system prompt's rules
+(never for routine labor-only jobs), and adds a small per-search fee on top of normal token
+costs only on the quotes where it actually searches.
