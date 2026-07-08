@@ -21,9 +21,10 @@ This only needs to be done once. Everything happens in the Cloudflare dashboard 
 Note: once saved, the value is hidden everywhere in the dashboard — this is expected, that's what keeps it safe.
 
 ## 4. Bind the rate-limit KV namespace
-1. Still in **Settings** → **Variables and Secrets** → **Add**.
-2. Type: **KV Namespace**. Variable name: `RATE_LIMIT_KV`. Namespace: select **`homeready-quote-ratelimit`** (already created).
-3. Click **Deploy** to apply it.
+KV/storage bindings live on a separate tab from plain variables and secrets.
+1. In **Settings** → **Bindings** → **Add**.
+2. Choose **KV Namespace**. Variable name: `RATE_LIMIT_KV`. Namespace: select **`homeready-quote-ratelimit`** (already created).
+3. Click **Add binding**, then **Deploy** to apply it.
 
 ## 5. Grab the Worker's URL
 On the Worker's **Overview** tab you'll see its live URL — something like:
