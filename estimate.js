@@ -1,6 +1,34 @@
 // Cloudflare Worker backing this page — see worker/quote-worker.js and worker/DEPLOY.md
 const QUOTE_API_URL = "https://homeready-quote-api.homereadyhelpers.workers.dev/";
 
+// ── PWA: service worker + install tip ──
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+
+(function initInstallTip() {
+  const isStandalone =
+    window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  if (isStandalone || localStorage.getItem('hr_install_tip_dismissed') === '1') return;
+
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const tip = document.getElementById('installTip');
+  const tipText = document.getElementById('installTipText');
+  if (!tip) return;
+
+  tipText.textContent = isIOS
+    ? 'Add this to your home screen: tap the Share icon, then "Add to Home Screen."'
+    : 'Add this to your home screen for one-tap access — use your browser menu → "Install app" or "Add to Home Screen."';
+
+  tip.classList.add('show');
+  document.getElementById('installTipDismiss').addEventListener('click', () => {
+    tip.classList.remove('show');
+    localStorage.setItem('hr_install_tip_dismissed', '1');
+  });
+})();
+
 const jobInput = document.getElementById('jobInput');
 const charCount = document.getElementById('charCount');
 const estimateBtn = document.getElementById('estimateBtn');

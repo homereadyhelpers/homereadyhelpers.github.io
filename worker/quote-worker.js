@@ -3,7 +3,7 @@
  *
  * Deploy as a Cloudflare Worker. Required setup (see DEPLOY.md):
  *   - Secret:  ANTHROPIC_API_KEY
- *   - KV binding named RATE_LIMIT_KV, bound to the "homereadyhelpers-quote-ratelimit"
+ *   - KV binding named RATE_LIMIT_KV, bound to the "homeready-quote-ratelimit"
  *     namespace (id: ed2f5781d2f443ce9aca960b9d6d1bb8)
  */
 
@@ -121,6 +121,9 @@ function jsonResponse(body, status, origin) {
 }
 
 async function checkRateLimit(env, ip) {
+  // Fail open if the KV binding isn't configured — a misconfigured
+  // rate limiter should never take down the whole quote feature.
+  if (!env.RATE_LIMIT_KV) return true;
   const key = `rl:${ip}`;
   const current = await env.RATE_LIMIT_KV.get(key);
   const count = current ? parseInt(current, 10) : 0;
@@ -147,90 +150,111 @@ export default {
       return jsonResponse({ error: "Method not allowed" }, 405, origin);
     }
 
-    if (origin && !ALLOWED_ORIGINS.has(origin)) {
-      return jsonResponse({ error: "Origin not allowed" }, 403, origin);
-    }
-
-    const ip = request.headers.get("CF-Connecting-IP") || "unknown";
-    const allowed = await checkRateLimit(env, ip);
-    if (!allowed) {
-      return jsonResponse(
-        {
-          error:
-            "You've hit the hourly limit for instant quotes. Please call 951-526-1636 or try again in a bit.",
-        },
-        429,
-        origin
-      );
-    }
-
-    let description;
+    // Everything below is wrapped so that ANY unexpected failure (a
+    // missing binding, a bad env var, whatever) still comes back as a
+    // real JSON error with CORS headers attached — instead of a bare
+    // platform error page with no CORS headers, which browsers report
+    // to JS as an opaque "NetworkError" / "Failed to fetch".
     try {
-      const body = await request.json();
-      description = typeof body.description === "string" ? body.description.trim() : "";
-    } catch {
-      return jsonResponse({ error: "Invalid request body" }, 400, origin);
-    }
+      if (origin && !ALLOWED_ORIGINS.has(origin)) {
+        return jsonResponse({ error: "Origin not allowed" }, 403, origin);
+      }
 
-    if (description.length < 3 || description.length > 600) {
+      const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+      const allowed = await checkRateLimit(env, ip);
+      if (!allowed) {
+        return jsonResponse(
+          {
+            error:
+              "You've hit the hourly limit for instant quotes. Please call 951-526-1636 or try again in a bit.",
+          },
+          429,
+          origin
+        );
+      }
+
+      let description;
+      try {
+        const body = await request.json();
+        description = typeof body.description === "string" ? body.description.trim() : "";
+      } catch {
+        return jsonResponse({ error: "Invalid request body" }, 400, origin);
+      }
+
+      if (description.length < 3 || description.length > 600) {
+        return jsonResponse(
+          { error: "Please describe the job in a sentence or two (up to 600 characters)." },
+          400,
+          origin
+        );
+      }
+
+      if (!env.ANTHROPIC_API_KEY) {
+        return jsonResponse(
+          { error: "Quote service is not configured yet — the API key is missing." },
+          500,
+          origin
+        );
+      }
+
+      let anthropicRes;
+      try {
+        anthropicRes = await fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": env.ANTHROPIC_API_KEY,
+            "anthropic-version": "2023-06-01",
+          },
+          body: JSON.stringify({
+            model: MODEL,
+            max_tokens: 800,
+            system: SYSTEM_PROMPT,
+            messages: [{ role: "user", content: description }],
+            tools: [QUOTE_TOOL],
+            tool_choice: { type: "tool", name: "provide_quote" },
+          }),
+        });
+      } catch {
+        return jsonResponse(
+          { error: "Couldn't reach the quote service. Please try again shortly." },
+          502,
+          origin
+        );
+      }
+
+      if (!anthropicRes.ok) {
+        const detail = await anthropicRes.text().catch(() => "");
+        return jsonResponse(
+          {
+            error: "Quote service returned an error. Please try again shortly.",
+            detail: detail.slice(0, 300),
+          },
+          502,
+          origin
+        );
+      }
+
+      const data = await anthropicRes.json();
+      const toolUse = (data.content || []).find(
+        (block) => block.type === "tool_use" && block.name === "provide_quote"
+      );
+
+      if (!toolUse) {
+        return jsonResponse(
+          { error: "Couldn't generate a quote from that description. Please try rephrasing." },
+          502,
+          origin
+        );
+      }
+
+      return jsonResponse({ quote: toolUse.input }, 200, origin);
+    } catch (err) {
       return jsonResponse(
-        { error: "Please describe the job in a sentence or two (up to 600 characters)." },
-        400,
+        { error: "Something went wrong generating that estimate. Please try again.", detail: String(err && err.message || err) },
+        500,
         origin
       );
     }
-
-    if (!env.ANTHROPIC_API_KEY) {
-      return jsonResponse({ error: "Quote service is not configured yet." }, 500, origin);
-    }
-
-    let anthropicRes;
-    try {
-      anthropicRes = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": env.ANTHROPIC_API_KEY,
-          "anthropic-version": "2023-06-01",
-        },
-        body: JSON.stringify({
-          model: MODEL,
-          max_tokens: 800,
-          system: SYSTEM_PROMPT,
-          messages: [{ role: "user", content: description }],
-          tools: [QUOTE_TOOL],
-          tool_choice: { type: "tool", name: "provide_quote" },
-        }),
-      });
-    } catch {
-      return jsonResponse(
-        { error: "Couldn't reach the quote service. Please try again shortly." },
-        502,
-        origin
-      );
-    }
-
-    if (!anthropicRes.ok) {
-      return jsonResponse(
-        { error: "Quote service returned an error. Please try again shortly." },
-        502,
-        origin
-      );
-    }
-
-    const data = await anthropicRes.json();
-    const toolUse = (data.content || []).find(
-      (block) => block.type === "tool_use" && block.name === "provide_quote"
-    );
-
-    if (!toolUse) {
-      return jsonResponse(
-        { error: "Couldn't generate a quote from that description. Please try rephrasing." },
-        502,
-        origin
-      );
-    }
-
-    return jsonResponse({ quote: toolUse.input }, 200, origin);
   },
 };
