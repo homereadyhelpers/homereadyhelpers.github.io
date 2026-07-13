@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hr-estimate-shell-v1';
+const CACHE_NAME = 'hr-estimate-shell-v2';
 const SHELL_ASSETS = [
   '/estimate.html',
   '/style.css',
@@ -24,22 +24,24 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Cache-first for the app shell so it opens instantly and works offline.
+// Network-first for the app shell: always try to get the latest deploy first
+// so a code change shows up on next load without waiting on a cache-name
+// bump, but fall back to the cached copy when offline (or the network
+// request fails) so it still works without a connection.
 // Never intercepts the quote API call itself — that always needs the network.
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   if (event.request.method !== 'GET' || url.origin !== self.location.origin) return;
 
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) return cached;
-      return fetch(event.request).then((res) => {
+    fetch(event.request)
+      .then((res) => {
         if (res.ok) {
           const clone = res.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
         }
         return res;
-      });
-    })
+      })
+      .catch(() => caches.match(event.request))
   );
 });
