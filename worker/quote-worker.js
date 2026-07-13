@@ -12,8 +12,11 @@
  *
  * Deploy as a Cloudflare Worker. Required setup (see DEPLOY.md):
  *   - Secret:  ANTHROPIC_API_KEY
+ *   - Secret:  OWNER_PIN (enables the owner-only "add this service to my
+ *     price list" flow on the estimate page — see loadCustomServices)
  *   - KV binding named RATE_LIMIT_KV, bound to the "homeready-quote-ratelimit"
- *     namespace (id: ed2f5781d2f443ce9aca960b9d6d1bb8)
+ *     namespace (id: ed2f5781d2f443ce9aca960b9d6d1bb8). Also stores any
+ *     custom services the owner adds.
  */
 
 const ALLOWED_ORIGINS = new Set([
@@ -68,13 +71,52 @@ const SERVICES = [
   { code: "toilet_seal_replacement", category: "Assembly & Misc.", label: "Toilet seal replacement", hours: 1.5, price: 135 },
   { code: "pressure_washing", category: "Assembly & Misc.", label: "Pressure washing, deck/patio (per 500 sq ft)", hours: 3, price: 270 },
 ];
-const SERVICES_BY_CODE = Object.fromEntries(SERVICES.map((s) => [s.code, s]));
+// Services added on the fly by the owner (via the PIN-gated "add this service"
+// prompt) are stored in KV under this key, as a JSON array with the same shape
+// as entries in SERVICES above. They're merged into the base list on every
+// request — see loadAllServices().
+const CUSTOM_SERVICES_KV_KEY = "custom_services_v1";
+
+async function loadCustomServices(env) {
+  if (!env.RATE_LIMIT_KV) return [];
+  try {
+    const raw = await env.RATE_LIMIT_KV.get(CUSTOM_SERVICES_KV_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+async function saveCustomService(env, service) {
+  const existing = await loadCustomServices(env);
+  const updated = [...existing, service];
+  await env.RATE_LIMIT_KV.put(CUSTOM_SERVICES_KV_KEY, JSON.stringify(updated));
+  return updated;
+}
+
+function slugifyServiceCode(label, existingCodes) {
+  const base =
+    label
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "_")
+      .replace(/^_+|_+$/g, "")
+      .slice(0, 40) || "custom_service";
+  let code = base;
+  let n = 2;
+  while (existingCodes.has(code)) {
+    code = `${base}_${n}`;
+    n++;
+  }
+  return code;
+}
 
 // ── PHASE 1: classify the job against the exact service list ─────────────
-const CLASSIFY_SYSTEM_PROMPT = `You are the job-classification assistant for HomeReady Helpers LLC, a Christian and veteran-owned solo handyman business in North Alabama (owner: Andrew). Read the customer's plain-English job description and match it to the exact priced services below. You NEVER invent, calculate, or state a dollar amount — pricing is looked up separately from an exact rate table. Your only job is accurate classification.
+function buildClassifySystemPrompt(allServices) {
+  return `You are the job-classification assistant for HomeReady Helpers LLC, a Christian and veteran-owned solo handyman business in North Alabama (owner: Andrew). Read the customer's plain-English job description and match it to the exact priced services below. You NEVER invent, calculate, or state a dollar amount — pricing is looked up separately from an exact rate table. Your only job is accurate classification.
 
 EXACT PRICED SERVICES (match to these codes — use the code exactly as written, do not invent new ones):
-${SERVICES.map((s) => `- ${s.code}: "${s.label}" (~${s.hours} hr)`).join("\n")}
+${allServices.map((s) => `- ${s.code}: "${s.label}" (~${s.hours} hr)`).join("\n")}
 
 OUT OF SCOPE: the business does NOT perform major plumbing, electrical, HVAC, or range hood work. If the job is clearly one of these (e.g. "rewire a breaker panel," "install new HVAC ductwork," "repipe a bathroom"), set status to "out_of_scope" and write a brief, friendly reason, suggesting a call to 951-526-1636.
 
@@ -85,45 +127,48 @@ CLASSIFICATION RULES:
 - Materials: the customer supplies all materials by default. Only include an entry in materialsNeeded when the customer explicitly says HomeReady Helpers should buy/supply a specific item — name it as a specific, searchable product (e.g. "Delta 4-inch centerset bathroom faucet", not just "a faucet").
 - Subscription plans exist: Basic $99/mo (1 hr labor), Standard $149/mo (1.5 hr labor + $30 materials), Premium $199/mo (2 hrs labor + $60 materials), all with $88/hr overage. If the job sounds small and recurring ("monthly," "few little things," "ongoing"), set suggestPlan true and briefly explain which plan fits in planSuggestion. Otherwise leave it false.
 - status is "priced" whenever at least one service matched and nothing needs review; "needs_review" if any part of the job doesn't match a listed service; "out_of_scope" only for the major-trades exclusions above.`;
+}
 
-const CLASSIFY_TOOL = {
-  name: "classify_job",
-  description: "Classify the described job against HomeReady Helpers' exact priced service list. Never state a price.",
-  input_schema: {
-    type: "object",
-    properties: {
-      status: { type: "string", enum: ["priced", "needs_review", "out_of_scope"] },
-      jobTitle: { type: "string", description: "Short title, e.g. 'Ceiling Fan Install + Faucet Replacement'" },
-      reason: {
-        type: "string",
-        description:
-          "For out_of_scope: a brief, friendly explanation. For needs_review: describe the part of the job that doesn't match a listed service.",
-      },
-      matchedServices: {
-        type: "array",
-        items: {
-          type: "object",
-          properties: {
-            code: { type: "string", enum: SERVICES.map((s) => s.code) },
-            quantity: { type: "number" },
+function buildClassifyTool(allServices) {
+  return {
+    name: "classify_job",
+    description: "Classify the described job against HomeReady Helpers' exact priced service list. Never state a price.",
+    input_schema: {
+      type: "object",
+      properties: {
+        status: { type: "string", enum: ["priced", "needs_review", "out_of_scope"] },
+        jobTitle: { type: "string", description: "Short title, e.g. 'Ceiling Fan Install + Faucet Replacement'" },
+        reason: {
+          type: "string",
+          description:
+            "For out_of_scope: a brief, friendly explanation. For needs_review: describe the part of the job that doesn't match a listed service.",
+        },
+        matchedServices: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              code: { type: "string", enum: allServices.map((s) => s.code) },
+              quantity: { type: "number" },
+            },
+            required: ["code"],
           },
-          required: ["code"],
         },
-      },
-      materialsNeeded: {
-        type: "array",
-        items: {
-          type: "object",
-          properties: { item: { type: "string" } },
-          required: ["item"],
+        materialsNeeded: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: { item: { type: "string" } },
+            required: ["item"],
+          },
         },
+        suggestPlan: { type: "boolean" },
+        planSuggestion: { type: "string" },
       },
-      suggestPlan: { type: "boolean" },
-      planSuggestion: { type: "string" },
+      required: ["status", "matchedServices"],
     },
-    required: ["status", "matchedServices"],
-  },
-};
+  };
+}
 
 // ── PHASE 2: exact material price from a real product page ───────────────
 const MATERIAL_SYSTEM_PROMPT = `Find the exact current price of a specific material on homedepot.com or lowes.com. Search first, then use web_fetch to open the single most relevant real product page, then report the price shown on that actual page using the report_material_price tool. Never estimate, round from memory, or invent a number — only report a price you actually saw on a fetched product page. If you can't find a clear match, set found to false.`;
@@ -215,11 +260,11 @@ async function callClaude(env, { system, messages, tools, toolChoice, maxTokens,
   });
 }
 
-async function classifyJob(env, description) {
+async function classifyJob(env, description, allServices) {
   const res = await callClaude(env, {
-    system: CLASSIFY_SYSTEM_PROMPT,
+    system: buildClassifySystemPrompt(allServices),
     messages: [{ role: "user", content: description }],
-    tools: [CLASSIFY_TOOL],
+    tools: [buildClassifyTool(allServices)],
     toolChoice: { type: "tool", name: "classify_job" },
     maxTokens: 800,
   });
@@ -271,13 +316,13 @@ async function lookupMaterialPrice(env, itemDescription) {
   return { found: false };
 }
 
-function buildPricedQuote(classification, matched, materialResults) {
+function buildPricedQuote(classification, matched, materialResults, servicesByCode) {
   const lineItems = [];
   let subtotal = 0;
   let totalHours = 0;
 
   for (const m of matched) {
-    const svc = SERVICES_BY_CODE[m.code];
+    const svc = servicesByCode[m.code];
     const qty = m.quantity && m.quantity > 0 ? m.quantity : 1;
     const amount = svc.price * qty;
     subtotal += amount;
@@ -364,10 +409,11 @@ export default {
         );
       }
 
-      let description;
+      let description, addService;
       try {
         const body = await request.json();
         description = typeof body.description === "string" ? body.description.trim() : "";
+        addService = body.addService && typeof body.addService === "object" ? body.addService : null;
       } catch {
         return jsonResponse({ error: "Invalid request body" }, 400, origin);
       }
@@ -388,7 +434,43 @@ export default {
         );
       }
 
-      const classifyRes = await classifyJob(env, description);
+      let customServices = await loadCustomServices(env);
+
+      // Owner-only: PIN-gated "add this to my price list" flow. Requires the
+      // OWNER_PIN secret to be set — if it isn't, the feature is disabled
+      // entirely rather than accepting any PIN.
+      if (addService) {
+        if (!env.OWNER_PIN) {
+          return jsonResponse({ error: "Adding services isn't set up yet." }, 400, origin);
+        }
+        if (String(addService.pin) !== env.OWNER_PIN) {
+          return jsonResponse({ error: "Incorrect PIN." }, 401, origin);
+        }
+        const label = typeof addService.label === "string" ? addService.label.trim() : "";
+        const hours = Number(addService.hours);
+        const price = Number(addService.price);
+        if (!label || !(hours > 0 && hours <= 40) || !(price > 0 && price <= 5000)) {
+          return jsonResponse(
+            { error: "Give the service a name, plus hours (0.25-40) and a price ($1-$5,000)." },
+            400,
+            origin
+          );
+        }
+        const existingCodes = new Set([...SERVICES, ...customServices].map((s) => s.code));
+        const newService = {
+          code: slugifyServiceCode(label, existingCodes),
+          category: "Custom",
+          label,
+          hours,
+          price,
+        };
+        customServices = await saveCustomService(env, newService);
+      }
+
+      const allServices = [...SERVICES, ...customServices];
+      const allServicesByCode = Object.fromEntries(allServices.map((s) => [s.code, s]));
+
+      const classifyRes = await classifyJob(env, description, allServices);
       if (classifyRes.error) {
         return jsonResponse(
           { error: "Couldn't generate a quote from that description. Please try rephrasing." },
@@ -403,6 +485,7 @@ export default {
           {
             quote: {
               inScope: false,
+              declineType: "out_of_scope",
               declineReason:
                 c.reason ||
                 "That's outside what HomeReady Helpers handles — give us a call at 951-526-1636 and we're happy to point you in the right direction.",
@@ -414,7 +497,7 @@ export default {
       }
 
       const matched = Array.isArray(c.matchedServices)
-        ? c.matchedServices.filter((m) => m && SERVICES_BY_CODE[m.code])
+        ? c.matchedServices.filter((m) => m && allServicesByCode[m.code])
         : [];
 
       if (matched.length === 0) {
@@ -422,6 +505,7 @@ export default {
           {
             quote: {
               inScope: false,
+              declineType: "unmatched",
               declineReason: `This doesn't match one of our standard priced services yet, so we can't generate an instant quote for it. ${
                 c.reason || ""
               } Call 951-526-1636 or fill out the request form and we'll get you an exact price after a quick look.`.trim(),
@@ -439,7 +523,7 @@ export default {
           .map(async (m) => ({ item: m.item, result: await lookupMaterialPrice(env, m.item) }))
       );
 
-      const quote = buildPricedQuote(c, matched, materialResults);
+      const quote = buildPricedQuote(c, matched, materialResults, allServicesByCode);
       return jsonResponse({ quote }, 200, origin);
     } catch (err) {
       return jsonResponse(

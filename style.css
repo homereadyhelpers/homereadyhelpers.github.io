@@ -1348,6 +1348,55 @@ footer {
   margin-bottom: 20px;
 }
 
+.add-service-prompt {
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px dashed rgba(255,255,255,0.12);
+}
+.add-service-toggle {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.82rem;
+  color: var(--grey);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.add-service-toggle:hover { color: var(--green-light); }
+.add-service-form {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.add-service-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--grey);
+}
+.add-service-form input {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 10px 12px;
+  color: var(--white);
+  font-size: 0.94rem;
+  font-family: inherit;
+}
+.add-service-form input:focus {
+  outline: none;
+  border-color: var(--green);
+}
+.add-service-row {
+  display: flex;
+  gap: 14px;
+}
+.add-service-row label { flex: 1; }
+.add-service-form .btn { align-self: flex-start; }
+
 /* Callout on the homepage promoting the estimate tool */
 .estimate-callout {
   margin-top: 40px;

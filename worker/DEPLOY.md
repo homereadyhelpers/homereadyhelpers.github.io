@@ -20,6 +20,13 @@ This only needs to be done once. Everything happens in the Cloudflare dashboard 
 
 Note: once saved, the value is hidden everywhere in the dashboard — this is expected, that's what keeps it safe.
 
+## 3b. Add your owner PIN as a secret (enables "add this service" on the estimate page)
+1. Same place — **Settings** → **Variables and Secrets** → **Add**.
+2. Type: **Secret**. Variable name: `OWNER_PIN`. Value: a PIN only you know (numbers or letters, your choice).
+3. Click **Deploy** to apply it.
+
+Without this secret set, the "Missing this service? Add it" prompt on the estimate page will always say adding isn't set up yet — it never accepts a guessed PIN.
+
 ## 4. Bind the rate-limit KV namespace
 KV/storage bindings live on a separate tab from plain variables and secrets.
 1. In **Settings** → **Bindings** → **Add**.
@@ -63,4 +70,9 @@ top of `quote-worker.js` and redeploy — nothing else needs to change.
 
 **Unlisted services:** if a customer describes something that isn't one of the priced
 services, the tool now declines with a "call for a custom quote" message instead of guessing
-a number.
+a number. That decline screen also has a collapsed "Missing this service? Add it to your
+price list" link — only you should have the PIN (see step 3b above), so customers browsing
+the public link just see the normal decline unless they know it. Entering the PIN plus a
+service name/hours/price saves it permanently (in the same KV namespace as rate limiting)
+and immediately re-runs the estimate with the new service included — no redeploy needed, it
+takes effect right away for all future quotes too.
