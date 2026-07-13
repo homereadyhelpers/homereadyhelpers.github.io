@@ -48,3 +48,19 @@ homedepot.com/lowes.com (only those two sites, capped at 2 searches per quote) t
 before finalizing the estimate. This only fires occasionally per the system prompt's rules
 (never for routine labor-only jobs), and adds a small per-search fee on top of normal token
 costs only on the quotes where it actually searches.
+
+## Exact, deterministic pricing (no more "different estimate every time")
+The Worker no longer lets the AI state a dollar amount anywhere. Labor pricing comes from a
+fixed `SERVICES` table in `quote-worker.js`, copied directly from Andrew's pricing spreadsheet
+— the AI only picks which service code(s) match the job description (a forced classification
+call), and plain JavaScript does the multiplication/summing. Material prices come from the
+same live Home Depot/Lowe's search above, but now the flow is: search → open the real product
+page → report only the price actually shown on that page (also a forced tool call, no
+estimating). Same job description in = same price out, every time.
+
+**To update labor prices:** edit the `price`/`hours` fields in the `SERVICES` array near the
+top of `quote-worker.js` and redeploy — nothing else needs to change.
+
+**Unlisted services:** if a customer describes something that isn't one of the priced
+services, the tool now declines with a "call for a custom quote" message instead of guessing
+a number.
