@@ -35,6 +35,13 @@ const estimateBtn = document.getElementById('estimateBtn');
 const errorBox = document.getElementById('estimateError');
 const resultBox = document.getElementById('estimateResult');
 const declineBox = document.getElementById('estimateDecline');
+const addServicePrompt = document.getElementById('addServicePrompt');
+const addServiceToggle = document.getElementById('addServiceToggle');
+const addServiceForm = document.getElementById('addServiceForm');
+const asError = document.getElementById('asError');
+const asSubmit = document.getElementById('asSubmit');
+
+let lastDescription = '';
 
 function updateCharCount() {
   const len = jobInput.value.length;
@@ -65,6 +72,29 @@ function hideError() {
 function hideResults() {
   resultBox.classList.remove('show');
   declineBox.classList.remove('show');
+  addServicePrompt.hidden = true;
+  addServiceForm.hidden = true;
+}
+
+async function requestQuote(body) {
+  const res = await fetch(QUOTE_API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+
+  let data;
+  try {
+    data = await res.json();
+  } catch {
+    throw new Error('Got an unexpected response. Please try again.');
+  }
+
+  if (!res.ok) {
+    throw new Error(data.error || 'Something went wrong generating that estimate.');
+  }
+
+  return data;
 }
 
 async function generateEstimate() {
@@ -84,23 +114,8 @@ async function generateEstimate() {
   estimateBtn.classList.add('loading');
 
   try {
-    const res = await fetch(QUOTE_API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ description }),
-    });
-
-    let data;
-    try {
-      data = await res.json();
-    } catch {
-      throw new Error('Got an unexpected response. Please try again.');
-    }
-
-    if (!res.ok) {
-      throw new Error(data.error || 'Something went wrong generating that estimate.');
-    }
-
+    lastDescription = description;
+    const data = await requestQuote({ description });
     renderQuote(data.quote);
   } catch (err) {
     showError(err.message || 'Network error — check your connection and try again.');
@@ -110,7 +125,49 @@ async function generateEstimate() {
   }
 }
 
+addServiceToggle.addEventListener('click', () => {
+  addServiceForm.hidden = !addServiceForm.hidden;
+});
+
+addServiceForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  asError.classList.remove('show');
+  asError.textContent = '';
+
+  const pin = document.getElementById('asPin').value;
+  const label = document.getElementById('asLabel').value.trim();
+  const hours = Number(document.getElementById('asHours').value);
+  const price = Number(document.getElementById('asPrice').value);
+
+  if (!pin || !label || !hours || !price) {
+    asError.textContent = 'Fill in the PIN, service name, hours, and price.';
+    asError.classList.add('show');
+    return;
+  }
+
+  asSubmit.disabled = true;
+  asSubmit.textContent = 'Saving…';
+
+  try {
+    const data = await requestQuote({
+      description: lastDescription,
+      addService: { pin, label, hours, price },
+    });
+    addServiceForm.reset();
+    addServiceForm.hidden = true;
+    renderQuote(data.quote);
+  } catch (err) {
+    asError.textContent = err.message || 'Could not save that service. Please try again.';
+    asError.classList.add('show');
+  } finally {
+    asSubmit.disabled = false;
+    asSubmit.textContent = 'Save & Get Estimate';
+  }
+});
+
 function renderQuote(quote) {
+  hideResults();
+
   if (!quote) {
     showError('Could not generate a quote from that description. Try rephrasing.');
     return;
@@ -119,6 +176,9 @@ function renderQuote(quote) {
   if (quote.inScope === false) {
     document.getElementById('rDeclineReason').textContent =
       quote.declineReason || "That falls outside what HomeReady Helpers handles — give us a call and we'll point you in the right direction.";
+    document.getElementById('rDeclineBadge').textContent =
+      quote.declineType === 'unmatched' ? "Not on the Price List Yet" : 'Outside What We Handle';
+    addServicePrompt.hidden = quote.declineType !== 'unmatched';
     declineBox.classList.add('show');
     declineBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
     return;

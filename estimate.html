@@ -140,9 +140,33 @@
       <!-- RESULT: out of scope -->
       <div class="estimate-result" id="estimateDecline">
         <div class="estimate-decline-card">
-          <span class="estimate-badge">Outside What We Handle</span>
+          <span class="estimate-badge" id="rDeclineBadge">Outside What We Handle</span>
           <p class="estimate-decline-text" id="rDeclineReason"></p>
           <a href="tel:9515261636" class="btn btn-outline">Call 951-526-1636</a>
+
+          <div class="add-service-prompt" id="addServicePrompt" hidden>
+            <button type="button" class="add-service-toggle" id="addServiceToggle">
+              Missing this service? Add it to your price list
+            </button>
+            <form class="add-service-form" id="addServiceForm" hidden>
+              <label>Owner PIN
+                <input type="password" id="asPin" inputmode="numeric" autocomplete="off" required>
+              </label>
+              <label>Service name
+                <input type="text" id="asLabel" maxlength="80" required>
+              </label>
+              <div class="add-service-row">
+                <label>Hours
+                  <input type="number" id="asHours" step="0.25" min="0.25" max="40" required>
+                </label>
+                <label>Price ($)
+                  <input type="number" id="asPrice" step="1" min="1" max="5000" required>
+                </label>
+              </div>
+              <button type="submit" class="btn btn-primary" id="asSubmit">Save &amp; Get Estimate</button>
+              <div class="estimate-error" id="asError"></div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
