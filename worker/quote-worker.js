@@ -194,14 +194,16 @@ async function checkRateLimit(env, ip) {
   return true;
 }
 
-async function callClaude(env, { system, messages, tools, toolChoice, maxTokens }) {
+async function callClaude(env, { system, messages, tools, toolChoice, maxTokens, beta }) {
+  const headers = {
+    "Content-Type": "application/json",
+    "x-api-key": env.ANTHROPIC_API_KEY,
+    "anthropic-version": "2023-06-01",
+  };
+  if (beta) headers["anthropic-beta"] = beta;
   return fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": env.ANTHROPIC_API_KEY,
-      "anthropic-version": "2023-06-01",
-    },
+    headers,
     body: JSON.stringify({
       model: MODEL,
       max_tokens: maxTokens,
@@ -241,11 +243,16 @@ async function lookupMaterialPrice(env, itemDescription) {
         tools: [MATERIAL_WEB_SEARCH_TOOL, MATERIAL_WEB_FETCH_TOOL, MATERIAL_TOOL],
         toolChoice: { type: "any" },
         maxTokens: 1500,
+        beta: "web-fetch-2025-09-10",
       });
-    } catch {
+    } catch (err) {
+      console.error("material lookup fetch threw", err);
       return { found: false };
     }
-    if (!res.ok) return { found: false };
+    if (!res.ok) {
+      console.error("material lookup API error", res.status, await res.text());
+      return { found: false };
+    }
     const data = await res.json();
     const toolUse = (data.content || []).find(
       (b) => b.type === "tool_use" && b.name === "report_material_price"
