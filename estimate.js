@@ -172,6 +172,59 @@ addServiceToggle.addEventListener('click', () => {
   addServiceForm.hidden = !addServiceForm.hidden;
 });
 
+// ── Pricing type: flat / per-unit / size tiers ──
+const asPricingType = document.getElementById('asPricingType');
+const asFlatFields = document.getElementById('asFlatFields');
+const asUnitFields = document.getElementById('asUnitFields');
+const asBracketFields = document.getElementById('asBracketFields');
+const asBracketRows = document.getElementById('asBracketRows');
+const asAddTier = document.getElementById('asAddTier');
+
+function updateAsFieldVisibility() {
+  const type = asPricingType.value;
+  asFlatFields.hidden = type !== 'flat';
+  asUnitFields.hidden = type !== 'per_unit';
+  asBracketFields.hidden = type !== 'brackets';
+}
+asPricingType.addEventListener('change', updateAsFieldVisibility);
+updateAsFieldVisibility();
+
+function addBracketRow() {
+  const row = document.createElement('div');
+  row.className = 'bracket-row';
+  row.innerHTML = `
+    <label>Up to <input type="number" class="bracket-max" placeholder="blank = and up" step="0.01" min="0"></label>
+    <label>Price ($) <input type="number" class="bracket-price" step="1" min="1" max="5000"></label>
+    <label>Hours <input type="number" class="bracket-hours" step="0.25" min="0.25" max="40"></label>
+    <button type="button" class="bracket-remove" aria-label="Remove tier">&times;</button>
+  `;
+  asBracketRows.appendChild(row);
+}
+addBracketRow();
+addBracketRow();
+
+asAddTier.addEventListener('click', () => {
+  if (asBracketRows.querySelectorAll('.bracket-row').length >= 8) return;
+  addBracketRow();
+});
+asBracketRows.addEventListener('click', (e) => {
+  if (!e.target.classList.contains('bracket-remove')) return;
+  if (asBracketRows.querySelectorAll('.bracket-row').length > 1) {
+    e.target.closest('.bracket-row').remove();
+  }
+});
+
+function collectBracketRows() {
+  return Array.from(asBracketRows.querySelectorAll('.bracket-row')).map((row) => {
+    const maxRaw = row.querySelector('.bracket-max').value;
+    return {
+      maxSize: maxRaw === '' ? null : Number(maxRaw),
+      price: Number(row.querySelector('.bracket-price').value),
+      hours: Number(row.querySelector('.bracket-hours').value),
+    };
+  });
+}
+
 addServiceForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   asError.classList.remove('show');
@@ -179,13 +232,45 @@ addServiceForm.addEventListener('submit', async (e) => {
 
   const pin = document.getElementById('asPin').value;
   const label = document.getElementById('asLabel').value.trim();
-  const hours = Number(document.getElementById('asHours').value);
-  const price = Number(document.getElementById('asPrice').value);
+  const pricingType = asPricingType.value;
 
-  if (!pin || !label || !hours || !price) {
-    asError.textContent = 'Fill in the PIN, service name, hours, and price.';
+  if (!pin || !label) {
+    asError.textContent = 'Fill in the PIN and service name.';
     asError.classList.add('show');
     return;
+  }
+
+  const payload = { pin, label, pricingType };
+
+  if (pricingType === 'flat') {
+    payload.hours = Number(document.getElementById('asHours').value);
+    payload.price = Number(document.getElementById('asPrice').value);
+    if (!payload.hours || !payload.price) {
+      asError.textContent = 'Fill in hours and price.';
+      asError.classList.add('show');
+      return;
+    }
+  } else if (pricingType === 'per_unit') {
+    payload.unitLabel = document.getElementById('asUnitLabel').value.trim();
+    payload.pricePerUnit = Number(document.getElementById('asPricePerUnit').value);
+    payload.hoursPerUnit = Number(document.getElementById('asHoursPerUnit').value);
+    const minPriceRaw = document.getElementById('asMinPrice').value;
+    const minHoursRaw = document.getElementById('asMinHours').value;
+    if (minPriceRaw !== '') payload.minPrice = Number(minPriceRaw);
+    if (minHoursRaw !== '') payload.minHours = Number(minHoursRaw);
+    if (!payload.unitLabel || !payload.pricePerUnit || !payload.hoursPerUnit) {
+      asError.textContent = 'Fill in the unit, price per unit, and hours per unit.';
+      asError.classList.add('show');
+      return;
+    }
+  } else if (pricingType === 'brackets') {
+    payload.unitLabel = document.getElementById('asBracketUnitLabel').value.trim();
+    payload.brackets = collectBracketRows();
+    if (!payload.unitLabel || payload.brackets.some((b) => !b.price || !b.hours)) {
+      asError.textContent = 'Fill in the unit and a price + hours for every tier.';
+      asError.classList.add('show');
+      return;
+    }
   }
 
   asSubmit.disabled = true;
@@ -194,10 +279,12 @@ addServiceForm.addEventListener('submit', async (e) => {
   try {
     const data = await requestQuote({
       description: lastDescription,
-      addService: { pin, label, hours, price },
+      addService: payload,
     });
     addServiceForm.reset();
     addServiceForm.hidden = true;
+    asPricingType.value = 'flat';
+    updateAsFieldVisibility();
     renderQuote(data.quote);
   } catch (err) {
     asError.textContent = err.message || 'Could not save that service. Please try again.';
@@ -219,8 +306,11 @@ function renderQuote(quote) {
   if (quote.inScope === false) {
     document.getElementById('rDeclineReason').textContent =
       quote.declineReason || "That falls outside what HomeReady Helpers handles — give us a call and we'll point you in the right direction.";
-    document.getElementById('rDeclineBadge').textContent =
-      quote.declineType === 'unmatched' ? "Not on the Price List Yet" : 'Outside What We Handle';
+    const badgeText = {
+      unmatched: 'Not on the Price List Yet',
+      needs_size: 'Need a Size to Price This',
+    }[quote.declineType] || 'Outside What We Handle';
+    document.getElementById('rDeclineBadge').textContent = badgeText;
     addServicePrompt.hidden = quote.declineType !== 'unmatched';
     declineBox.classList.add('show');
     declineBox.scrollIntoView({ behavior: 'smooth', block: 'start' });

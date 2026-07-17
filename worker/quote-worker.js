@@ -111,19 +111,107 @@ function slugifyServiceCode(label, existingCodes) {
   return code;
 }
 
+// Validates and builds a new custom-service record from the owner's
+// "add this service" form. Supports three pricing shapes:
+//   - flat: one fixed price/hours regardless of size (the original behavior)
+//   - per_unit: a rate per unit (per sq ft, per linear ft, etc.), optionally
+//     floored by a minimum price/hours
+//   - brackets: size ranges, each with its own flat price/hours; the last
+//     bracket may leave maxSize unset to mean "and up"
+// Returns { error: string } or { service: {...} } — never both.
+function buildNewServiceFromInput(input, existingCodes) {
+  const label = typeof input.label === "string" ? input.label.trim() : "";
+  if (!label) return { error: "Give the service a name." };
+
+  const pricingType = ["flat", "per_unit", "brackets"].includes(input.pricingType)
+    ? input.pricingType
+    : "flat";
+  const code = slugifyServiceCode(label, existingCodes);
+  const base = { code, category: "Custom", label, pricingType };
+
+  if (pricingType === "flat") {
+    const hours = Number(input.hours);
+    const price = Number(input.price);
+    if (!(hours > 0 && hours <= 40) || !(price > 0 && price <= 5000)) {
+      return { error: "Give hours (0.25-40) and a price ($1-$5,000)." };
+    }
+    return { service: { ...base, hours, price } };
+  }
+
+  const unitLabel = typeof input.unitLabel === "string" ? input.unitLabel.trim().slice(0, 30) : "";
+  if (!unitLabel) return { error: 'Give a unit, e.g. "sq ft" or "linear ft".' };
+
+  if (pricingType === "per_unit") {
+    const pricePerUnit = Number(input.pricePerUnit);
+    const hoursPerUnit = Number(input.hoursPerUnit);
+    if (!(pricePerUnit > 0 && pricePerUnit <= 5000) || !(hoursPerUnit > 0 && hoursPerUnit <= 10)) {
+      return { error: "Give a price per unit ($0.01-$5,000) and hours per unit (0.001-10)." };
+    }
+    const service = { ...base, unitLabel, pricePerUnit, hoursPerUnit };
+    if (input.minPrice !== undefined && input.minPrice !== null && input.minPrice !== "") {
+      const minPrice = Number(input.minPrice);
+      if (!(minPrice >= 0 && minPrice <= 5000)) return { error: "Minimum price must be $0-$5,000." };
+      service.minPrice = minPrice;
+    }
+    if (input.minHours !== undefined && input.minHours !== null && input.minHours !== "") {
+      const minHours = Number(input.minHours);
+      if (!(minHours >= 0 && minHours <= 40)) return { error: "Minimum hours must be 0-40." };
+      service.minHours = minHours;
+    }
+    return { service };
+  }
+
+  // brackets
+  const rawBrackets = Array.isArray(input.brackets) ? input.brackets : [];
+  if (rawBrackets.length < 1 || rawBrackets.length > 8) {
+    return { error: "Add 1-8 size tiers." };
+  }
+  const brackets = [];
+  let prevMax = 0;
+  for (let i = 0; i < rawBrackets.length; i++) {
+    const b = rawBrackets[i] || {};
+    const isLast = i === rawBrackets.length - 1;
+    const hasMax = !(b.maxSize === null || b.maxSize === undefined || b.maxSize === "");
+    const maxSize = hasMax ? Number(b.maxSize) : null;
+    const price = Number(b.price);
+    const hours = Number(b.hours);
+    if (!isLast && (maxSize === null || !(maxSize > prevMax))) {
+      return { error: `Tier ${i + 1} needs an "up to" size greater than the previous tier.` };
+    }
+    if (isLast && maxSize !== null && !(maxSize > prevMax)) {
+      return { error: `The last tier's "up to" size must be greater than the previous tier (or leave it blank for "and up").` };
+    }
+    if (!(price > 0 && price <= 5000) || !(hours > 0 && hours <= 40)) {
+      return { error: `Tier ${i + 1} needs a price ($1-$5,000) and hours (0.25-40).` };
+    }
+    brackets.push({ maxSize, price, hours });
+    if (maxSize !== null) prevMax = maxSize;
+  }
+  return { service: { ...base, unitLabel, brackets } };
+}
+
 // ── PHASE 1: classify the job against the exact service list ─────────────
+function describeServiceForPrompt(s) {
+  const type = s.pricingType || "flat";
+  if (type === "per_unit" || type === "brackets") {
+    return `- ${s.code}: "${s.label}" — priced by ${s.unitLabel}. Report the exact number of ${s.unitLabel} the customer described as quantity.`;
+  }
+  return `- ${s.code}: "${s.label}" (~${s.hours} hr, flat rate)`;
+}
+
 function buildClassifySystemPrompt(allServices) {
   return `You are the job-classification assistant for HomeReady Helpers LLC, a Christian and veteran-owned solo handyman business in North Alabama (owner: Andrew). Read the customer's plain-English job description and match it to the exact priced services below. You NEVER invent, calculate, or state a dollar amount — pricing is looked up separately from an exact rate table. Your only job is accurate classification.
 
 EXACT PRICED SERVICES (match to these codes — use the code exactly as written, do not invent new ones):
-${allServices.map((s) => `- ${s.code}: "${s.label}" (~${s.hours} hr)`).join("\n")}
+${allServices.map(describeServiceForPrompt).join("\n")}
 
 OUT OF SCOPE: the business does NOT perform major plumbing, electrical, HVAC, or range hood work. If the job is clearly one of these (e.g. "rewire a breaker panel," "install new HVAC ductwork," "repipe a bathroom"), set status to "out_of_scope" and write a brief, friendly reason, suggesting a call to 951-526-1636.
 
 CLASSIFICATION RULES:
 - Match every distinct task in the description to a service code. A job can match multiple codes.
 - If a task doesn't clearly match any listed service, do NOT force it onto the closest code. Instead set status to "needs_review", still list whatever DID match in matchedServices (if anything), and describe the unmatched part in reason so we can tell the customer it needs a quick look before we can price it.
-- Set quantity greater than 1 only when the description clearly implies multiple units of the exact same service (e.g. "hang two groups of pictures" -> picture_hanging quantity 2; "1000 sq ft of pressure washing" -> pressure_washing quantity 2, since that service is priced per 500 sq ft). Default quantity is 1.
+- For flat-rate services, set quantity greater than 1 only when the description clearly implies multiple separate instances of the exact same service (e.g. "hang two groups of pictures" -> picture_hanging quantity 2). Default quantity is 1.
+- For services marked "priced by [unit]" above, quantity means the exact measurement in that unit — read the number directly from the description (e.g. "1,200 sq ft of vinyl flooring" -> quantity 1200). Never estimate, round, or calculate this number yourself. If the customer didn't give a size for one of these services, still include it in matchedServices but leave quantity unset entirely — we'll ask them for the measurement rather than guess.
 - Materials: the customer supplies all materials by default. Only include an entry in materialsNeeded when the customer explicitly says HomeReady Helpers should buy/supply a specific item — name it as a specific, searchable product (e.g. "Delta 4-inch centerset bathroom faucet", not just "a faucet").
 - Subscription plans exist: Basic $99/mo (1 hr labor), Standard $149/mo (1.5 hr labor + $30 materials), Premium $199/mo (2 hrs labor + $60 materials), all with $88/hr overage. If the job sounds small and recurring ("monthly," "few little things," "ongoing"), set suggestPlan true and briefly explain which plan fits in planSuggestion. Otherwise leave it false.
 - status is "priced" whenever at least one service matched and nothing needs review; "needs_review" if any part of the job doesn't match a listed service; "out_of_scope" only for the major-trades exclusions above.`;
@@ -316,6 +404,33 @@ async function lookupMaterialPrice(env, itemDescription) {
   return { found: false };
 }
 
+// A service "needs a size" when it's priced per-unit or by size tier and the
+// classifier didn't get a usable measurement from the description. Checked
+// before any pricing math runs, so we ask for the number instead of guessing.
+function matchedServiceNeedsSize(m, svc) {
+  const type = svc.pricingType || "flat";
+  if (type !== "per_unit" && type !== "brackets") return false;
+  return !(typeof m.quantity === "number" && m.quantity > 0);
+}
+
+function priceBracketService(svc, size) {
+  const brackets = svc.brackets || [];
+  const tier = brackets.find((b) => b.maxSize == null || size <= b.maxSize) || brackets[brackets.length - 1];
+  return { amount: tier.price, hours: tier.hours, note: `${size.toLocaleString()} ${svc.unitLabel} — size-tier rate` };
+}
+
+function pricePerUnitService(svc, size) {
+  let amount = Math.round(svc.pricePerUnit * size * 100) / 100;
+  let hours = svc.hoursPerUnit * size;
+  if (typeof svc.minPrice === "number") amount = Math.max(amount, svc.minPrice);
+  if (typeof svc.minHours === "number") hours = Math.max(hours, svc.minHours);
+  return {
+    amount,
+    hours,
+    note: `$${svc.pricePerUnit}/${svc.unitLabel} × ${size.toLocaleString()} ${svc.unitLabel}`,
+  };
+}
+
 function buildPricedQuote(classification, matched, materialResults, servicesByCode) {
   const lineItems = [];
   let subtotal = 0;
@@ -323,14 +438,29 @@ function buildPricedQuote(classification, matched, materialResults, servicesByCo
 
   for (const m of matched) {
     const svc = servicesByCode[m.code];
-    const qty = m.quantity && m.quantity > 0 ? m.quantity : 1;
-    const amount = svc.price * qty;
-    subtotal += amount;
-    totalHours += svc.hours * qty;
+    const type = svc.pricingType || "flat";
+
+    if (type === "flat") {
+      const qty = m.quantity && m.quantity > 0 ? m.quantity : 1;
+      const amount = svc.price * qty;
+      subtotal += amount;
+      totalHours += svc.hours * qty;
+      lineItems.push({
+        label: qty > 1 ? `${svc.label} × ${qty}` : svc.label,
+        amount: `$${amount.toLocaleString()}`,
+        note: "Exact rate from our price list",
+      });
+      continue;
+    }
+
+    const size = m.quantity;
+    const priced = type === "brackets" ? priceBracketService(svc, size) : pricePerUnitService(svc, size);
+    subtotal += priced.amount;
+    totalHours += priced.hours;
     lineItems.push({
-      label: qty > 1 ? `${svc.label} × ${qty}` : svc.label,
-      amount: `$${amount.toLocaleString()}`,
-      note: "Exact rate from our price list",
+      label: `${svc.label} (${size.toLocaleString()} ${svc.unitLabel})`,
+      amount: `$${priced.amount.toLocaleString()}`,
+      note: priced.note,
     });
   }
 
@@ -358,12 +488,14 @@ function buildPricedQuote(classification, matched, materialResults, servicesByCo
     notes = `This estimate covers the part(s) of the job we could price exactly. ${classification.reason}`;
   }
 
+  const roundedHours = Math.round(totalHours * 4) / 4;
+
   return {
     inScope: true,
     jobTitle: classification.jobTitle || "Job Estimate",
     estimateRange: { low: subtotal, high: subtotal },
     lineItems,
-    timeEstimate: totalHours ? `About ${totalHours} hour${totalHours === 1 ? "" : "s"}` : undefined,
+    timeEstimate: roundedHours ? `About ${roundedHours} hour${roundedHours === 1 ? "" : "s"}` : undefined,
     notes,
     suggestPlan: !!classification.suggestPlan,
     planSuggestion: classification.planSuggestion,
@@ -460,25 +592,12 @@ export default {
         if (String(addService.pin) !== env.OWNER_PIN) {
           return jsonResponse({ error: "Incorrect PIN." }, 401, origin);
         }
-        const label = typeof addService.label === "string" ? addService.label.trim() : "";
-        const hours = Number(addService.hours);
-        const price = Number(addService.price);
-        if (!label || !(hours > 0 && hours <= 40) || !(price > 0 && price <= 5000)) {
-          return jsonResponse(
-            { error: "Give the service a name, plus hours (0.25-40) and a price ($1-$5,000)." },
-            400,
-            origin
-          );
-        }
         const existingCodes = new Set([...SERVICES, ...customServices].map((s) => s.code));
-        const newService = {
-          code: slugifyServiceCode(label, existingCodes),
-          category: "Custom",
-          label,
-          hours,
-          price,
-        };
-        customServices = await saveCustomService(env, newService);
+        const built = buildNewServiceFromInput(addService, existingCodes);
+        if (built.error) {
+          return jsonResponse({ error: built.error }, 400, origin);
+        }
+        customServices = await saveCustomService(env, built.service);
       }
 
       const allServices = [...SERVICES, ...customServices];
@@ -523,6 +642,24 @@ export default {
               declineReason: `This doesn't match one of our standard priced services yet, so we can't generate an instant quote for it. ${
                 c.reason || ""
               } Call 951-526-1636 or fill out the request form and we'll get you an exact price after a quick look.`.trim(),
+            },
+          },
+          200,
+          origin
+        );
+      }
+
+      const needsSize = matched.filter((m) => matchedServiceNeedsSize(m, allServicesByCode[m.code]));
+      if (needsSize.length > 0) {
+        const asks = needsSize
+          .map((m) => `${allServicesByCode[m.code].label} (${allServicesByCode[m.code].unitLabel})`)
+          .join(", ");
+        return jsonResponse(
+          {
+            quote: {
+              inScope: false,
+              declineType: "needs_size",
+              declineReason: `We just need a measurement to price this exactly — ${asks}. Add the size to your description (e.g. "1,200 sq ft") and try again, or call 951-526-1636.`,
             },
           },
           200,

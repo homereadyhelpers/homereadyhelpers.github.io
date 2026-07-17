@@ -1396,6 +1396,63 @@ footer {
 }
 .add-service-row label { flex: 1; }
 .add-service-form .btn { align-self: flex-start; }
+.add-service-form select {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 10px 12px;
+  color: var(--white);
+  font-size: 0.94rem;
+  font-family: inherit;
+}
+.add-service-form select:focus { outline: none; border-color: var(--green); }
+
+#asUnitFields, #asBracketFields {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+#asBracketRows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.bracket-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+.bracket-row label {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: var(--grey);
+}
+.bracket-row input {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 8px 10px;
+  color: var(--white);
+  font-size: 0.88rem;
+  font-family: inherit;
+}
+.bracket-row input:focus { outline: none; border-color: var(--green); }
+.bracket-remove {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--grey);
+  width: 32px;
+  height: 32px;
+  flex: none;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+}
+.bracket-remove:hover { color: #e3a58f; border-color: rgba(198,90,60,0.4); }
 
 .pin-gate {
   position: fixed;
