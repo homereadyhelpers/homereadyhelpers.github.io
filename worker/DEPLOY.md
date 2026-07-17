@@ -3,17 +3,22 @@
 This only needs to be done once. Everything happens in the Cloudflare dashboard — no command line required.
 
 ## Taking it offline / bringing it back
-The estimate generator's frontend pages were removed from the repo (2026-07-17) while it's
-developed and tested further offline — but the Worker itself stays deployed and reachable at
-its `.workers.dev` URL unless you also take it down here.
+The estimate generator's public-facing files (`estimate.html` etc.) were removed from the repo
+(2026-07-17) while it's developed and tested further offline — but the Worker itself stays
+deployed and reachable at its `.workers.dev` URL unless you also take it down here.
 
 - **To take the Worker offline too:** paste [`quote-worker-offline.js`](./quote-worker-offline.js)
   into the Worker's **Edit code** screen and **Deploy**. It just replies "offline" to every
   request. Your secrets and KV binding stay configured, so nothing needs to be redone later.
-- **To relaunch:** paste [`quote-worker.js`](./quote-worker.js) back in and **Deploy**, then
-  restore `estimate.html`, `estimate.js`, `sw.js`, `manifest.json`, and
-  `icons/icon-512-maskable.png` from git history and re-add the nav/footer/homepage links that
-  were removed.
+- **Private testing in the meantime:** the owner-only preview page lives at an unlisted
+  filename — `q7k2m9xzv4.html` — not linked from anywhere on the site and marked `noindex`, so
+  it works like the old `estimate.html` (including installing it to a phone home screen) without
+  being discoverable through normal browsing or search. Bookmark
+  `https://homereadyhelpers.com/q7k2m9xzv4.html` directly.
+- **To relaunch publicly:** paste [`quote-worker.js`](./quote-worker.js) back into the Worker
+  and **Deploy**, then rename `q7k2m9xzv4.html`/`q7k2m9xzv4.js` back to `estimate.html`/
+  `estimate.js` (updating the self-references and `manifest.json`'s `start_url` back to match),
+  remove the `noindex` meta tag, and re-add the nav/footer/homepage links that were removed.
 
 ## 1. Create the Worker
 1. Go to [dash.cloudflare.com](https://dash.cloudflare.com) → **Workers & Pages** → **Create**.
