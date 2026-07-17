@@ -1,9 +1,9 @@
 const CACHE_NAME = 'hr-estimate-shell-v3';
 const SHELL_ASSETS = [
-  '/q7k2m9xzv4.html',
+  '/estimate.html',
   '/style.css',
   '/script.js',
-  '/q7k2m9xzv4.js',
+  '/estimate.js',
   '/IMG_2296.png',
   '/manifest.json',
 ];

@@ -409,13 +409,27 @@ export default {
         );
       }
 
-      let description, addService;
+      let description, addService, verifyPin;
       try {
         const body = await request.json();
         description = typeof body.description === "string" ? body.description.trim() : "";
         addService = body.addService && typeof body.addService === "object" ? body.addService : null;
+        verifyPin = typeof body.verifyPin === "string" ? body.verifyPin : null;
       } catch {
         return jsonResponse({ error: "Invalid request body" }, 400, origin);
+      }
+
+      // Private-preview gate: the estimate page itself isn't public yet, and
+      // stays locked behind this PIN check until the owner unlocks it in
+      // their browser. Same OWNER_PIN secret as the "add service" flow.
+      if (verifyPin !== null) {
+        if (!env.OWNER_PIN) {
+          return jsonResponse({ error: "This preview isn't set up yet." }, 400, origin);
+        }
+        if (verifyPin !== env.OWNER_PIN) {
+          return jsonResponse({ error: "Incorrect PIN." }, 401, origin);
+        }
+        return jsonResponse({ ok: true }, 200, origin);
       }
 
       if (description.length < 3 || description.length > 600) {

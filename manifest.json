@@ -2,7 +2,7 @@
   "name": "HomeReady Helpers — Instant Estimate",
   "short_name": "HR Estimate",
   "description": "Get an instant handyman job estimate from HomeReady Helpers LLC.",
-  "start_url": "/q7k2m9xzv4.html",
+  "start_url": "/estimate.html",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",

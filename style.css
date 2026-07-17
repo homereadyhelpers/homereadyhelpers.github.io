@@ -1397,6 +1397,60 @@ footer {
 .add-service-row label { flex: 1; }
 .add-service-form .btn { align-self: flex-start; }
 
+.pin-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--black);
+}
+.pin-gate.unlocked { display: none; }
+.pin-gate-card {
+  width: 100%;
+  max-width: 360px;
+  background: rgba(74,140,63,0.06);
+  border: 1px solid rgba(74,140,63,0.3);
+  border-radius: 6px;
+  padding: 32px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  text-align: center;
+}
+.pin-gate-badge {
+  align-self: center;
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--green-light);
+  background: rgba(74,140,63,0.15);
+  border: 1px solid rgba(74,140,63,0.3);
+  padding: 5px 12px;
+  border-radius: 2px;
+}
+.pin-gate-text {
+  color: var(--grey);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+.pin-gate-card input {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 12px 14px;
+  color: var(--white);
+  font-size: 1rem;
+  text-align: center;
+  letter-spacing: 2px;
+  font-family: inherit;
+}
+.pin-gate-card input:focus { outline: none; border-color: var(--green); }
+.pin-gate-card .estimate-error { text-align: left; }
+
 /* Callout on the homepage promoting the estimate tool */
 .estimate-callout {
   margin-top: 40px;

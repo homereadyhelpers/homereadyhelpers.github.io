@@ -12,7 +12,7 @@
   <meta property="og:title" content="Instant Estimate | HomeReady Helpers LLC" />
   <meta property="og:description" content="Describe your job, get an instant ballpark estimate. Veteran & Christian-owned handyman service in North Alabama." />
   <meta property="og:image" content="https://homereadyhelpers.com/icons/icon-512.png" />
-  <meta property="og:url" content="https://homereadyhelpers.com/q7k2m9xzv4.html" />
+  <meta property="og:url" content="https://homereadyhelpers.com/estimate.html" />
   <meta name="twitter:card" content="summary_large_image" />
 
   <!-- PWA -->
@@ -31,6 +31,20 @@
 </head>
 <body>
 
+  <!-- ── PRIVATE PREVIEW LOCK ─────────────────────────────────
+       This page isn't linked from the live site yet. It stays hidden
+       behind this PIN gate (checked against the Worker, not stored in
+       this file) until the owner is ready to relaunch it publicly. -->
+  <div class="pin-gate" id="pinGate">
+    <form class="pin-gate-card" id="pinGateForm">
+      <div class="pin-gate-badge">Private Preview</div>
+      <p class="pin-gate-text">This tool isn't public yet. Enter the owner PIN to continue.</p>
+      <input type="password" id="pinGateInput" inputmode="numeric" autocomplete="off" placeholder="PIN" required>
+      <button type="submit" class="btn btn-primary" id="pinGateSubmit">Unlock</button>
+      <div class="estimate-error" id="pinGateError"></div>
+    </form>
+  </div>
+
   <!-- ── SCROLL PROGRESS BAR ─────────────────────────────────── -->
   <div class="scroll-progress"></div>
 
@@ -48,7 +62,7 @@
         <li><a href="index.html#about">About</a></li>
         <li><a href="index.html#services">Services</a></li>
         <li><a href="index.html#pricing">Pricing</a></li>
-        <li><a href="q7k2m9xzv4.html" class="active-link">Instant Estimate</a></li>
+        <li><a href="estimate.html" class="active-link">Instant Estimate</a></li>
         <li><a href="index.html#book" class="nav-cta">Book Now</a></li>
       </ul>
       <button class="nav-toggle" id="navToggle" onclick="toggleMenu()" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobileMenu">
@@ -62,7 +76,7 @@
     <a href="index.html#about" onclick="closeMenu()">About</a>
     <a href="index.html#services" onclick="closeMenu()">Services</a>
     <a href="index.html#pricing" onclick="closeMenu()">Pricing</a>
-    <a href="q7k2m9xzv4.html" onclick="closeMenu()" style="color: var(--green-light);">Instant Estimate</a>
+    <a href="estimate.html" onclick="closeMenu()" style="color: var(--green-light);">Instant Estimate</a>
     <a href="index.html#book" onclick="closeMenu()">Book Now</a>
   </div>
 
@@ -236,6 +250,6 @@
   <button class="back-to-top" aria-label="Back to top">↑</button>
 
   <script src="script.js" defer></script>
-  <script src="q7k2m9xzv4.js" defer></script>
+  <script src="estimate.js" defer></script>
 </body>
 </html>

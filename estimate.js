@@ -1,6 +1,49 @@
 // Cloudflare Worker backing this page — see worker/quote-worker.js and worker/DEPLOY.md
 const QUOTE_API_URL = "https://homeready-quote-api.homereadyhelpers.workers.dev/";
 
+// ── Private preview lock: this page isn't public yet, so nothing below
+// runs until the owner PIN is verified against the Worker (the PIN itself
+// never ships in this file — only the Worker knows it). ──
+(function initPinGate() {
+  const gate = document.getElementById('pinGate');
+  const form = document.getElementById('pinGateForm');
+  const input = document.getElementById('pinGateInput');
+  const error = document.getElementById('pinGateError');
+  const submitBtn = document.getElementById('pinGateSubmit');
+
+  if (localStorage.getItem('hr_owner_pin_ok') === '1') {
+    gate.classList.add('unlocked');
+    return;
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    error.classList.remove('show');
+    error.textContent = '';
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Checking…';
+
+    try {
+      const res = await fetch(QUOTE_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ verifyPin: input.value }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Incorrect PIN.');
+
+      localStorage.setItem('hr_owner_pin_ok', '1');
+      gate.classList.add('unlocked');
+    } catch (err) {
+      error.textContent = err.message || 'Incorrect PIN.';
+      error.classList.add('show');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Unlock';
+    }
+  });
+})();
+
 // ── PWA: service worker + install tip ──
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
