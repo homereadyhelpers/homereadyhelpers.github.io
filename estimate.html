@@ -170,14 +170,54 @@
               <label>Service name
                 <input type="text" id="asLabel" maxlength="80" required>
               </label>
-              <div class="add-service-row">
+
+              <label>Pricing type
+                <select id="asPricingType">
+                  <option value="flat">Flat rate</option>
+                  <option value="per_unit">Per unit (sq ft, linear ft, item, etc.)</option>
+                  <option value="brackets">Size tiers</option>
+                </select>
+              </label>
+
+              <div class="add-service-row" id="asFlatFields">
                 <label>Hours
-                  <input type="number" id="asHours" step="0.25" min="0.25" max="40" required>
+                  <input type="number" id="asHours" step="0.25" min="0.25" max="40">
                 </label>
                 <label>Price ($)
-                  <input type="number" id="asPrice" step="1" min="1" max="5000" required>
+                  <input type="number" id="asPrice" step="1" min="1" max="5000">
                 </label>
               </div>
+
+              <div id="asUnitFields" hidden>
+                <label>Unit (e.g. "sq ft", "linear ft", "item")
+                  <input type="text" id="asUnitLabel" maxlength="30">
+                </label>
+                <div class="add-service-row">
+                  <label>Price per unit ($)
+                    <input type="number" id="asPricePerUnit" step="0.01" min="0.01" max="5000">
+                  </label>
+                  <label>Hours per unit
+                    <input type="number" id="asHoursPerUnit" step="0.001" min="0.001" max="10">
+                  </label>
+                </div>
+                <div class="add-service-row">
+                  <label>Minimum price (optional)
+                    <input type="number" id="asMinPrice" step="1" min="0" max="5000">
+                  </label>
+                  <label>Minimum hours (optional)
+                    <input type="number" id="asMinHours" step="0.25" min="0" max="40">
+                  </label>
+                </div>
+              </div>
+
+              <div id="asBracketFields" hidden>
+                <label>Unit (e.g. "sq ft")
+                  <input type="text" id="asBracketUnitLabel" maxlength="30">
+                </label>
+                <div id="asBracketRows"></div>
+                <button type="button" id="asAddTier" class="add-service-toggle">+ Add another tier</button>
+              </div>
+
               <button type="submit" class="btn btn-primary" id="asSubmit">Save &amp; Get Estimate</button>
               <div class="estimate-error" id="asError"></div>
             </form>
