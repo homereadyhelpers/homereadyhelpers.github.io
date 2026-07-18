@@ -89,6 +89,11 @@ async function loadCustomServices(env) {
 }
 
 async function saveCustomService(env, service) {
+  if (!env.RATE_LIMIT_KV) {
+    throw new Error(
+      "Can't save custom services: the RATE_LIMIT_KV binding isn't configured on this Worker (check Settings -> Bindings in Cloudflare)."
+    );
+  }
   const existing = await loadCustomServices(env);
   const updated = [...existing, service];
   await env.RATE_LIMIT_KV.put(CUSTOM_SERVICES_KV_KEY, JSON.stringify(updated));
