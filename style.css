@@ -16,6 +16,11 @@
 /* ── RESET ────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* The [hidden] attribute must always win over any component's own display
+   rule (e.g. `.add-service-form { display: flex }`) — otherwise elements
+   toggled via JS's `.hidden = true` stay visible despite the attribute. */
+[hidden] { display: none !important; }
+
 html {
   scroll-behavior: smooth;
 }
