@@ -413,6 +413,38 @@ function matchedServiceNeedsSize(m, svc) {
   return !(typeof m.quantity === "number" && m.quantity > 0);
 }
 
+// Guards against a custom service saved with an incomplete/malformed shape
+// (e.g. from an old client bug, or a KV record edited by hand) crashing the
+// whole request when it's matched. Checked before any pricing math runs.
+function serviceDefinitionIsBroken(svc) {
+  const type = svc.pricingType || "flat";
+  if (type === "flat") {
+    return !(typeof svc.hours === "number" && svc.hours > 0 && typeof svc.price === "number" && svc.price > 0);
+  }
+  if (type === "per_unit") {
+    return !(
+      typeof svc.unitLabel === "string" &&
+      svc.unitLabel &&
+      typeof svc.pricePerUnit === "number" &&
+      svc.pricePerUnit > 0 &&
+      typeof svc.hoursPerUnit === "number" &&
+      svc.hoursPerUnit > 0
+    );
+  }
+  if (type === "brackets") {
+    return !(
+      typeof svc.unitLabel === "string" &&
+      svc.unitLabel &&
+      Array.isArray(svc.brackets) &&
+      svc.brackets.length > 0 &&
+      svc.brackets.every(
+        (b) => b && typeof b.price === "number" && b.price > 0 && typeof b.hours === "number" && b.hours > 0
+      )
+    );
+  }
+  return true;
+}
+
 function priceBracketService(svc, size) {
   const brackets = svc.brackets || [];
   const tier = brackets.find((b) => b.maxSize == null || size <= b.maxSize) || brackets[brackets.length - 1];
@@ -642,6 +674,22 @@ export default {
               declineReason: `This doesn't match one of our standard priced services yet, so we can't generate an instant quote for it. ${
                 c.reason || ""
               } Call 951-526-1636 or fill out the request form and we'll get you an exact price after a quick look.`.trim(),
+            },
+          },
+          200,
+          origin
+        );
+      }
+
+      const broken = matched.filter((m) => serviceDefinitionIsBroken(allServicesByCode[m.code]));
+      if (broken.length > 0) {
+        const labels = broken.map((m) => allServicesByCode[m.code].label).join(", ");
+        return jsonResponse(
+          {
+            quote: {
+              inScope: false,
+              declineType: "misconfigured",
+              declineReason: `"${labels}" is set up with incomplete pricing — re-add it from the PIN-gated form with every field filled in, or call 951-526-1636 for now.`,
             },
           },
           200,

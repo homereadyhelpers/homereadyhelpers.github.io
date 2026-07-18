@@ -310,6 +310,7 @@ function renderQuote(quote) {
     const badgeText = {
       unmatched: 'Not on the Price List Yet',
       needs_size: 'Need a Size to Price This',
+      misconfigured: 'Price Setup Needs a Fix',
     }[quote.declineType] || 'Outside What We Handle';
     document.getElementById('rDeclineBadge').textContent = badgeText;
     addServicePrompt.hidden = quote.declineType !== 'unmatched';
