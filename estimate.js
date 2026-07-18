@@ -134,7 +134,8 @@ async function requestQuote(body) {
   }
 
   if (!res.ok) {
-    throw new Error(data.error || 'Something went wrong generating that estimate.');
+    const message = data.error || 'Something went wrong generating that estimate.';
+    throw new Error(data.detail ? `${message} (${data.detail})` : message);
   }
 
   return data;
