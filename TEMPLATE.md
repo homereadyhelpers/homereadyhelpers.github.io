@@ -19,9 +19,10 @@ repos by hand.
 - **Colors** — `style.css`, the `:root` block at the top. Six variables control the whole
   site's palette (`--black`, `--green`, `--green-light`, `--green-dark`, `--white`, `--grey`).
   Swap these and everything cascades — cards, buttons, badges, nav, footer.
-- **Fonts** — same `:root` block (`--font-display`, `--font-body`, `--font-accent`), plus the
-  Google Fonts `<link>` in the `<head>` of `index.html` (and `estimate.html` in the `obsi` repo)
-  — keep them in sync.
+- **Fonts** — same `:root` block (`--font-display`, `--font-body`, `--font-accent`). Currently
+  set to system font stacks (Arial Black/Impact for display, Helvetica Neue/Arial for body), so
+  no Google Fonts `<link>` is loaded. If a new brand needs a webfont, add the `<link>` back to
+  the `<head>` of `index.html` (and `estimate.html` in the `obsi` repo) and keep them in sync.
 - **Logo** — replace `IMG_2296.png` with the new client's logo (same filename, or update every
   `<img src="IMG_2296.png">` reference — there are 3 in `index.html`, plus copies in the `obsi`
   repo's `estimate.html`).
