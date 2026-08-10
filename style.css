@@ -403,13 +403,30 @@ nav.scrolled {
   animation: fadeUp 0.7s ease 0.4s both;
 }
 .hero-logo-wrap {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   animation: fadeIn 1s ease 0.3s both;
 }
+.hero-logo-glow {
+  position: absolute;
+  width: 560px;
+  height: 560px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(107,208,93,0.45) 0%, rgba(107,208,93,0.18) 40%, transparent 72%);
+  filter: blur(6px);
+  animation: glowPulse 4.5s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.75; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
 .hero-logo-ring {
   position: relative;
+  z-index: 1;
   width: 340px;
   height: 340px;
   will-change: transform;
@@ -419,7 +436,7 @@ nav.scrolled {
   position: absolute;
   inset: -20px;
   border-radius: 50%;
-  border: 1px solid rgba(78,163,69,0.25);
+  border: 1px solid rgba(107,208,93,0.35);
   animation: spin 20s linear infinite;
 }
 .hero-logo-ring::after {
@@ -427,7 +444,7 @@ nav.scrolled {
   position: absolute;
   inset: -40px;
   border-radius: 50%;
-  border: 1px dashed rgba(78,163,69,0.12);
+  border: 1px dashed rgba(107,208,93,0.18);
   animation: spin 35s linear infinite reverse;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -436,7 +453,7 @@ nav.scrolled {
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
-  filter: drop-shadow(0 0 40px rgba(78,163,69,0.25));
+  filter: drop-shadow(0 0 50px rgba(107,208,93,0.45));
 }
 
 @keyframes fadeUp {
@@ -1538,6 +1555,7 @@ footer {
   .hero-inner { grid-template-columns: 1fr; text-align: center; }
   .hero-logo-wrap { order: -1; }
   .hero-logo-ring { width: 220px; height: 220px; }
+  .hero-logo-glow { width: 380px; height: 380px; }
   .hero-badges, .hero-actions { justify-content: center; }
   .about-grid { grid-template-columns: 1fr; }
   .about-img-wrap { display: none; }
