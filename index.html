@@ -284,7 +284,7 @@
 
       <div class="pricing-tabs">
         <button class="pricing-tab active" onclick="showTab('labor', this)">Labor Rates</button>
-        <button class="pricing-tab" onclick="showTab('subscriptions', this)">Monthly Plans</button>
+        <button class="pricing-tab" onclick="showTab('subscriptions', this)">Maintenance Plans</button>
         <button class="pricing-tab" onclick="showTab('packages', this)">Hour Packages</button>
       </div>
 
@@ -321,6 +321,11 @@
 
       <!-- SUBSCRIPTION PLANS -->
       <div class="pricing-panel" id="tab-subscriptions">
+        <div class="tab-intro-note">
+          These are <strong>general home maintenance</strong> plans — recurring upkeep like small
+          repairs, fixes, and honey-do tasks. Got a bigger project or something outside normal
+          maintenance? Check out <a href="#" onclick="showTab('packages', document.querySelectorAll('.pricing-tab')[2]); return false;">Hour Packages</a> instead.
+        </div>
         <div class="plan-cards">
           <div class="plan-card reveal">
             <div class="plan-name">Basic</div>
@@ -363,6 +368,11 @@
 
       <!-- HOUR PACKAGES -->
       <div class="pricing-panel" id="tab-packages">
+        <div class="tab-intro-note">
+          Hour Packages are for work <strong>outside normal home maintenance</strong> — renovations,
+          larger projects, and one-off jobs. For routine upkeep, see our
+          <a href="#" onclick="showTab('subscriptions', document.querySelectorAll('.pricing-tab')[1]); return false;">Maintenance Plans</a> instead.
+        </div>
         <table class="pricing-table">
           <thead>
             <tr>
