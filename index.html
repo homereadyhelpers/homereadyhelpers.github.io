@@ -400,19 +400,122 @@
   <!-- ── BOOKING CTA ────────────────────────────────────────── -->
   <section id="book" class="section">
     <div class="container">
-      <div class="book-inner reveal">
+      <div class="book-header reveal">
         <span class="tag">Let's Get to Work</span>
-        <h2 class="section-title">Ready to <span>Get Started?</span></h2>
-        <p class="book-quote">
-          "Whatever you do, work at it with all your heart, as working for the Lord,
-          not for human masters." — Colossians 3:23
+        <h2 class="section-title">Book Your <span>Service</span></h2>
+        <p class="section-intro">
+          Pick a service and a date that works for you. I only take one job a day,
+          so your project gets my full attention.
         </p>
-        <div class="book-actions">
-          <a href="https://forms.gle/g29sGJyyHtXctqeb6" target="_blank" class="btn btn-primary">Fill Out Our Request Form</a>
+      </div>
+
+      <div class="booking-widget reveal">
+        <div class="booking-steps">
+          <div class="booking-step active" data-step="1"><span>1</span>Service</div>
+          <div class="booking-step" data-step="2"><span>2</span>Date</div>
+          <div class="booking-step" data-step="3"><span>3</span>Your Info</div>
         </div>
 
-        <p class="payment-note">We accept Cash · Zelle · Venmo &nbsp;|&nbsp; Materials sourced by us billed at cost + 20%</p>
+        <!-- STEP 1: SERVICE -->
+        <div class="booking-panel active" id="booking-step-1">
+          <div class="booking-service-grid" id="bookingServiceGrid"></div>
+        </div>
+
+        <!-- CALL-FIRST NOTICE (flooring / painting) -->
+        <div class="booking-panel" id="booking-callfirst">
+          <div class="callfirst-notice">
+            <div class="callfirst-icon">📞</div>
+            <h3><span id="callfirstServiceName">This project</span> Needs a Quick Call First</h3>
+            <p>
+              Jobs like this can run several hours — sometimes more than one day. Text or call
+              me first so I can look at the scope and block off however many days it needs.
+            </p>
+            <div class="callfirst-actions">
+              <a href="tel:9515261636" class="btn btn-primary">📞 Call 951 · 526 · 1636</a>
+              <a href="sms:9515261636" class="btn btn-outline">💬 Text Instead</a>
+            </div>
+            <button type="button" class="booking-back-link" onclick="Booking.backToServices()">← Choose a different service</button>
+          </div>
+        </div>
+
+        <!-- STEP 2: DATE -->
+        <div class="booking-panel" id="booking-step-2">
+          <button type="button" class="booking-back-link" onclick="Booking.goToStep(1)">← Back to services</button>
+          <div class="booking-selected-service" id="bookingSelectedService"></div>
+          <div class="calendar">
+            <div class="calendar-header">
+              <button type="button" class="calendar-nav" id="calPrev" aria-label="Previous month">‹</button>
+              <div class="calendar-month" id="calMonthLabel"></div>
+              <button type="button" class="calendar-nav" id="calNext" aria-label="Next month">›</button>
+            </div>
+            <div class="calendar-weekdays">
+              <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+            </div>
+            <div class="calendar-grid" id="calGrid"></div>
+            <div class="calendar-legend">
+              <span><i class="legend-dot legend-open"></i> Open</span>
+              <span><i class="legend-dot legend-booked"></i> Booked</span>
+              <span><i class="legend-dot legend-closed"></i> Closed</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3: DETAILS -->
+        <div class="booking-panel" id="booking-step-3">
+          <button type="button" class="booking-back-link" onclick="Booking.goToStep(2)">← Back to calendar</button>
+          <div class="booking-summary" id="bookingSummary"></div>
+
+          <div class="booking-field">
+            <label>Preferred Arrival Window</label>
+            <div class="booking-window-options">
+              <button type="button" class="window-option active" data-window="Morning (8am–12pm)">Morning</button>
+              <button type="button" class="window-option" data-window="Afternoon (12pm–4pm)">Afternoon</button>
+            </div>
+          </div>
+
+          <form class="booking-form" id="bookingForm">
+            <div class="booking-field">
+              <label for="bkName">Name</label>
+              <input type="text" id="bkName" required>
+            </div>
+            <div class="booking-field">
+              <label for="bkPhone">Phone</label>
+              <input type="tel" id="bkPhone" required>
+            </div>
+            <div class="booking-field">
+              <label for="bkAddress">Address / Area</label>
+              <input type="text" id="bkAddress" required>
+            </div>
+            <div class="booking-field">
+              <label for="bkNotes">Job Details (optional)</label>
+              <textarea id="bkNotes" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary booking-submit">Request This Booking</button>
+            <p class="pricing-note" style="margin-top:16px;">
+              This opens a text to 951 · 526 · 1636 with your details — the date is confirmed once I text you back.
+            </p>
+          </form>
+        </div>
+
+        <!-- CONFIRMATION -->
+        <div class="booking-panel" id="booking-confirm">
+          <div class="callfirst-notice">
+            <div class="callfirst-icon">✅</div>
+            <h3>Request Sent!</h3>
+            <p>Your messaging app should have opened with your booking details ready to send. Once I confirm, that date is yours.</p>
+            <button type="button" class="btn btn-outline" onclick="Booking.reset()">Book Another Service</button>
+          </div>
+        </div>
       </div>
+
+      <p class="book-quote">
+        "Whatever you do, work at it with all your heart, as working for the Lord,
+        not for human masters." — Colossians 3:23
+      </p>
+      <p class="payment-note" style="text-align:center;">
+        We accept Cash · Zelle · Venmo &nbsp;|&nbsp;
+        Bigger or custom project? <a href="https://forms.gle/g29sGJyyHtXctqeb6" target="_blank">Fill out our request form</a> instead.
+      </p>
     </div>
   </section>
 
@@ -478,6 +581,8 @@
   <!-- ── BACK TO TOP ─────────────────────────────────────────── -->
   <button class="back-to-top" aria-label="Back to top">↑</button>
 
+  <script src="booking-data.js" defer></script>
+  <script src="booking.js" defer></script>
   <script src="script.js" defer></script>
 </body>
 </html>
