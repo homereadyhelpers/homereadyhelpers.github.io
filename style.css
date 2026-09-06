@@ -1021,122 +1021,15 @@ nav.scrolled {
   padding: 3px 10px;
 }
 
-.calendar-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-}
-.calendar-month {
-  font-family: var(--font-display);
-  font-size: 1rem;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: var(--white);
-}
-.calendar-nav {
-  background: none;
+.calendly-embed-wrap {
   border: 1px solid var(--border);
-  color: var(--white);
-  width: 32px; height: 32px;
-  cursor: pointer;
-  font-size: 1.1rem;
-  transition: border-color 0.2s, color 0.2s;
-}
-.calendar-nav:hover:not(:disabled) { border-color: var(--green); color: var(--green-light); }
-.calendar-nav:disabled { opacity: 0.25; cursor: not-allowed; }
-
-.calendar-weekdays, .calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
-}
-.calendar-weekdays {
-  margin-bottom: 6px;
-  text-align: center;
-  font-size: 0.7rem;
-  letter-spacing: 1px;
-  color: var(--grey);
-  text-transform: uppercase;
-}
-.cal-cell {
-  aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255,255,255,0.02);
-  border: 1px solid var(--border);
-  color: var(--white);
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: background 0.2s, border-color 0.2s, transform 0.15s;
-}
-.cal-cell:hover:not(:disabled) { border-color: var(--green); background: rgba(78,163,69,0.08); }
-.cal-cell.cal-empty { background: none; border: none; cursor: default; }
-.cal-cell.cal-disabled { color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.01); cursor: not-allowed; }
-.cal-cell.cal-booked { color: rgba(255,80,80,0.5); text-decoration: line-through; }
-.cal-cell.cal-selected { background: var(--green); border-color: var(--green); color: var(--white); font-weight: 700; transform: scale(1.05); }
-
-.calendar-legend {
-  display: flex;
-  gap: 18px;
-  justify-content: center;
-  margin-top: 18px;
-  font-size: 0.75rem;
-  color: var(--grey);
-}
-.calendar-legend span { display: flex; align-items: center; gap: 6px; }
-.legend-dot { width: 9px; height: 9px; display: inline-block; border-radius: 50%; }
-.legend-open { background: rgba(255,255,255,0.15); }
-.legend-booked { background: rgba(255,80,80,0.5); }
-.legend-closed { background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
-
-.booking-summary {
-  background: rgba(78,163,69,0.06);
-  border: 1px solid rgba(78,163,69,0.2);
-  padding: 16px 20px;
-  margin-bottom: 24px;
-}
-.booking-summary-row { color: var(--grey); font-size: 0.9rem; margin-bottom: 4px; }
-.booking-summary-row strong { color: var(--white); font-family: var(--font-display); letter-spacing: 0.5px; }
-
-.booking-field { margin-bottom: 18px; }
-.booking-field label {
-  display: block;
-  font-size: 0.75rem;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: var(--grey);
-  margin-bottom: 8px;
-}
-.booking-field input, .booking-field textarea {
-  width: 100%;
   background: #000000;
-  border: 1px solid var(--border);
-  color: var(--white);
-  padding: 12px 14px;
-  font-family: var(--font-body);
-  font-size: 0.92rem;
-  transition: border-color 0.2s;
+  overflow: hidden;
 }
-.booking-field input:focus, .booking-field textarea:focus {
-  outline: none;
-  border-color: var(--green);
+.calendly-embed {
+  min-width: 280px;
+  height: 720px;
 }
-.booking-window-options { display: flex; gap: 10px; }
-.window-option {
-  flex: 1;
-  background: #000000;
-  border: 1px solid var(--border);
-  color: var(--grey);
-  padding: 10px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  transition: border-color 0.2s, color 0.2s, background 0.2s;
-}
-.window-option.active { border-color: var(--green); color: var(--white); background: rgba(78,163,69,0.08); }
-
-.booking-submit { width: 100%; text-align: center; }
 
 @media (max-width: 640px) {
   .booking-widget { padding: 24px 18px; }
@@ -1144,6 +1037,7 @@ nav.scrolled {
   .booking-steps { gap: 0; }
   .booking-step { padding: 0 10px; font-size: 10px; }
   .booking-step span { width: 18px; height: 18px; }
+  .calendly-embed { height: 900px; }
 }
 
 /* ── TESTIMONIALS / WHY US ────────────────────────────── */
