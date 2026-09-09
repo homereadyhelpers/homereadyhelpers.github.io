@@ -6,12 +6,24 @@ Project instructions for Claude Code sessions working in this repo
 ## Obsidian vault sync (Google Drive)
 
 The client keeps a project vault in Obsidian, synced to a Google Drive
-folder named **"HomeReady Helpers Vault"**. This repo's work is tracked
-there as a set of linked Markdown notes.
+folder named **"HomeReady Helpers Vault"**
+(`https://drive.google.com/drive/folders/1u8qwvkFROOcwtFTrIhCTOtylKD-WgrSx`,
+Drive folder ID `1u8qwvkFROOcwtFTrIhCTOtylKD-WgrSx`, owned by
+`homereadyhelpers@gmail.com`). This repo's work is tracked there as a
+set of linked Markdown notes (00 Project Overview, 01/02 Booking
+Calendar iterations, 03 Calendly Buffer Setup Guide, 99 Project Rules).
+
+> Note: as of 2026-09-09 there is a **second, empty** folder also named
+> "HomeReady Helpers Vault" in the same Drive (a leftover from initial
+> setup) — always confirm you're reading/writing the one containing
+> `.obsidian` and the notes above, ideally by matching the folder ID,
+> not just the name.
 
 **At the start of every session working in this repo:**
-1. Use the connected Google Drive tools to find the **"HomeReady Helpers
-   Vault"** folder and read through its notes before starting any work.
+1. Use the connected Google Drive tools to find that folder (search by
+   the ID above if possible, otherwise by name — but verify it contains
+   `.obsidian` and the existing notes before trusting it) and read
+   through its notes before starting any work.
 2. Use that context — prior decisions, pending TODOs, known limitations —
    to inform the session instead of re-deriving it from scratch or asking
    the client to repeat themselves.
