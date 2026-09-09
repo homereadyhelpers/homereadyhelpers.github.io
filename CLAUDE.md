@@ -45,6 +45,30 @@ a decision made, a dashboard setting configured outside this repo, etc.):
 Don't skip this because a change feels small — the point of the vault is
 that nothing gets lost between sessions.
 
+### Updating an existing note (not creating a new one)
+
+The connected Google Drive tools can't edit a file's content in place —
+only create new files or change a file's title/folder. So "updating" an
+existing note means: trash the old file, then create a new one with the
+identical title in the same folder. This is expected and fine — but it
+has a side effect that must be cleaned up as part of the same step:
+
+1. Trash the old version of the note (by file ID, not just title).
+2. Create the new version with the same title in the vault folder.
+3. **Immediately re-list the vault folder's contents** and check for a
+   stray 0-byte file with that same title — Obsidian's own sync can
+   recreate an empty placeholder in the moment between the trash and the
+   create. If one exists, trash it too, in the same turn, without
+   waiting to be asked.
+4. Do the same check for stray empty **folders** any time a folder is
+   created or renamed in the vault (e.g. two folders ending up with the
+   same name).
+
+The end state after any vault write must be: exactly one file per note
+title, exactly one folder per folder name, no 0-byte leftovers. Verify
+this before telling the client the vault was updated — don't just assume
+the write succeeded cleanly.
+
 ## Working agreement
 
 - **Never push directly to `main`.** `main` is the live site
