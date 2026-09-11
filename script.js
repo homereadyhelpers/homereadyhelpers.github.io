@@ -65,7 +65,7 @@ const countObserver = new IntersectionObserver((entries) => {
 document.querySelectorAll('[data-count-to]').forEach(el => countObserver.observe(el));
 
 // ── ACTIVE NAV LINK ON SCROLL ──
-const sectionIds = ['about', 'services', 'pricing', 'book'];
+const sectionIds = ['about', 'services', 'pricing'];
 const navLinkMap = {};
 document.querySelectorAll('.nav-links a[href^="#"]').forEach(a => {
   navLinkMap[a.getAttribute('href').slice(1)] = a;

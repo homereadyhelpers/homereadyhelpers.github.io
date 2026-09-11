@@ -19,7 +19,6 @@
   <meta name="theme-color" content="#000000" />
 
   <link rel="stylesheet" href="style.css" />
-  <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet" />
 </head>
 <body>
 
@@ -40,7 +39,6 @@
         <li><a href="#about">About</a></li>
         <li><a href="#services">Services</a></li>
         <li><a href="#pricing">Pricing</a></li>
-        <li><a href="#book" class="nav-cta">Book Now</a></li>
       </ul>
       <button class="nav-toggle" id="navToggle" onclick="toggleMenu()" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobileMenu">
         <span></span><span></span><span></span>
@@ -53,7 +51,6 @@
     <a href="#about" onclick="closeMenu()">About</a>
     <a href="#services" onclick="closeMenu()">Services</a>
     <a href="#pricing" onclick="closeMenu()">Pricing</a>
-    <a href="#book" onclick="closeMenu()" style="color: var(--green-light);">Book Now</a>
   </div>
 
   <!-- ── HERO ──────────────────────────────────────────────── -->
@@ -393,66 +390,6 @@
     </div>
   </section>
 
-  <!-- ── BOOKING CTA ────────────────────────────────────────── -->
-  <section id="book" class="section">
-    <div class="container">
-      <div class="book-header reveal">
-        <span class="tag">Let's Get to Work</span>
-        <h2 class="section-title">Book Your <span>Service</span></h2>
-        <p class="section-intro">
-          Pick a service and grab an open time — it syncs straight to my calendar,
-          so you'll see exactly what's really available.
-        </p>
-      </div>
-
-      <div class="booking-widget reveal">
-        <div class="booking-steps">
-          <div class="booking-step active" data-step="1"><span>1</span>Service</div>
-          <div class="booking-step" data-step="2"><span>2</span>Schedule</div>
-        </div>
-
-        <!-- STEP 1: SERVICE -->
-        <div class="booking-panel active" id="booking-step-1">
-          <div class="booking-service-grid" id="bookingServiceGrid"></div>
-        </div>
-
-        <!-- NO CALENDLY EVENT YET (e.g. door install) -->
-        <div class="booking-panel" id="booking-callfirst">
-          <div class="callfirst-notice">
-            <div class="callfirst-icon">📞</div>
-            <h3><span id="callfirstServiceName">This project</span> Needs a Quick Call First</h3>
-            <p>
-              This one isn't on the online scheduler yet — text or call me and I'll get you booked in.
-            </p>
-            <div class="callfirst-actions">
-              <a href="tel:9515261636" class="btn btn-primary">📞 Call 951 · 526 · 1636</a>
-              <a href="sms:9515261636" class="btn btn-outline">💬 Text Instead</a>
-            </div>
-            <button type="button" class="booking-back-link" onclick="Booking.backToServices()">← Choose a different service</button>
-          </div>
-        </div>
-
-        <!-- STEP 2: CALENDLY SCHEDULER -->
-        <div class="booking-panel" id="booking-step-2">
-          <button type="button" class="booking-back-link" onclick="Booking.backToServices()">← Back to services</button>
-          <div class="booking-selected-service" id="bookingSelectedService"></div>
-          <p class="pricing-note" id="bookingServiceNote" hidden></p>
-          <div class="calendly-embed-wrap">
-            <div id="calendlyEmbed" class="calendly-embed"></div>
-          </div>
-        </div>
-      </div>
-
-      <p class="book-quote">
-        "Whatever you do, work at it with all your heart, as working for the Lord,
-        not for human masters." — Colossians 3:23
-      </p>
-      <p class="payment-note" style="text-align:center;">
-        We accept Cash · Zelle · Venmo
-      </p>
-    </div>
-  </section>
-
   <!-- ── FOOTER ─────────────────────────────────────────────── -->
   <footer>
     <div class="container">
@@ -510,9 +447,6 @@
   <!-- ── BACK TO TOP ─────────────────────────────────────────── -->
   <button class="back-to-top" aria-label="Back to top">↑</button>
 
-  <script src="https://assets.calendly.com/assets/external/widget.js" async></script>
-  <script src="booking-data.js" defer></script>
-  <script src="booking.js" defer></script>
   <script src="script.js" defer></script>
 </body>
 </html>
