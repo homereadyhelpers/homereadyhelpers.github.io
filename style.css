@@ -1200,10 +1200,6 @@ footer {
   border: 1.5px solid var(--white);
   color: var(--white);
 }
-.mobile-cta-bar .cta-quote {
-  background: var(--green);
-  color: var(--white);
-}
 
 /* ── BACK TO TOP ──────────────────────────────────────── */
 .back-to-top {
