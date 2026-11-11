@@ -72,8 +72,8 @@ infrastructure between clients.
 
 ## 6. Payment methods & business policies
 
-Search for `Cash · Zelle · Venmo`, the Venmo processing-fee note, and the "materials cost + 20%"
-language — these are specific business policies, not universal to every service company.
+Search for `Cash · Zelle · Venmo`, the Venmo processing-fee note, and the "materials at cost" + $50
+materials-pickup fee language — these are specific business policies, not universal to every service company.
 
 ## What ISN'T templated (yet)
 
